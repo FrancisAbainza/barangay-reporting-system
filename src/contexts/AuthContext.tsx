@@ -7,11 +7,20 @@ interface User {
   role: 'resident' | 'admin';
 }
 
+interface SignupData {
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
+  signup: (data: SignupData) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -44,17 +53,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signup = async (email: string, password: string, name: string) => {
+  const signup = async (data: SignupData) => {
     setLoading(true);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Mock user data
+      const fullName = data.middleName 
+        ? `${data.firstName} ${data.middleName} ${data.lastName}`
+        : `${data.firstName} ${data.lastName}`;
+      
       const mockUser: User = {
         id: '2',
-        email,
-        name,
+        email: data.email,
+        name: fullName,
         role: 'resident',
       };
       
