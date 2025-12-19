@@ -1,11 +1,25 @@
 import "./global.css"
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import AuthenticationStack from './src/navigation/AuthenticationStack';
+import AuthenticatedTabs from './src/navigation/AuthenticatedTabs';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
+
+function AppContent() {
+  const { user } = useAuth();
+  
+  return (
+    <NavigationContainer>
+      {user ? <AuthenticatedTabs /> : <AuthenticationStack />}
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -26,10 +40,8 @@ export default function App() {
   }
 
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-xl font-bold text-blue-500" style={{ fontFamily: 'Inter_700Bold' }}>
-        Welcome to Nativewind!
-      </Text>
-    </View>
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
