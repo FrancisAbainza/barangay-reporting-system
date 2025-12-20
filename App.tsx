@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import { DummyDbProvider } from './src/contexts/DummyDbContext';
 import AuthenticationStack from './src/navigation/AuthenticationStack';
 import AuthenticatedTabs from './src/navigation/AuthenticatedTabs';
 
@@ -41,7 +42,9 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <AppContent />
+      <DummyDbProvider>
+        <AppContent />
+      </DummyDbProvider>
     </AuthProvider>
   );
 }

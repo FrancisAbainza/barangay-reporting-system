@@ -1,13 +1,20 @@
 import React from 'react';
 import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import ComplaintsScreen from '../screens/ComplaintsScreen';
+import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
 import ForumScreen from '../screens/ForumScreen';
 import CreateScreen from '../screens/CreateScreen';
 import TransparencyScreen from '../screens/TransparencyScreen';
 import AccountScreen from '../screens/AccountScreen';
 import { colors } from '../constants/colors';
+
+export type ComplaintsStackParamList = {
+  ComplaintsList: undefined;
+  ComplaintDetail: { complaintId: string };
+};
 
 export type TabParamList = {
   Complaints: undefined;
@@ -18,6 +25,16 @@ export type TabParamList = {
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
+const ComplaintsStack = createNativeStackNavigator<ComplaintsStackParamList>();
+
+function ComplaintsNavigator() {
+  return (
+    <ComplaintsStack.Navigator screenOptions={{ headerShown: false }}>
+      <ComplaintsStack.Screen name="ComplaintsList" component={ComplaintsScreen} />
+      <ComplaintsStack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
+    </ComplaintsStack.Navigator>
+  );
+}
 
 export default function AuthenticatedTabs() {
   return (
@@ -29,7 +46,7 @@ export default function AuthenticatedTabs() {
     >
       <Tab.Screen 
         name="Complaints" 
-        component={ComplaintsScreen}
+        component={ComplaintsNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="megaphone" size={size} color={color} />
