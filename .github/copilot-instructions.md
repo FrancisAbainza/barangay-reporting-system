@@ -7,6 +7,17 @@
 - Follow existing project structure and naming conventions.
 - Do not introduce new libraries unless explicitly instructed.
 
+## Project Structure & Modularity
+
+- Keep the project highly modular.
+- Split code into small, reusable components whenever possible.
+- Each component should have a single responsibility.
+- Avoid large, monolithic components.
+- Shared logic must be extracted into reusable components or hooks.
+- Screens should only compose components, not contain complex logic.
+- Reusable UI elements must live in a shared components directory.
+- Business logic should not be embedded directly inside UI components.
+
 ## UI / UX
 
 - All components must be responsive and work across different screen sizes.

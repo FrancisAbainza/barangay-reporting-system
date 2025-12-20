@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/AuthenticationStack';
 import { colors } from '../constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import { Button } from '../components/ui';
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
 
@@ -25,25 +26,16 @@ export default function WelcomeScreen({ navigation }: WelcomeScreenProps) {
       </View>
 
       <View className="gap-4">
-        <TouchableOpacity
-          className="rounded-lg py-4 items-center justify-center"
-          style={{ backgroundColor: colors.primary }}
+        <Button
+          title="Login"
           onPress={() => navigation.navigate('Login')}
-        >
-          <Text className="text-base font-semibold" style={{ color: colors.white }}>
-            Login
-          </Text>
-        </TouchableOpacity>
+        />
 
-        <TouchableOpacity
-          className="rounded-lg py-4 items-center justify-center border-2"
-          style={{ borderColor: colors.primary, backgroundColor: colors.white }}
+        <Button
+          title="Create Account"
+          variant="secondary"
           onPress={() => navigation.navigate('Signup')}
-        >
-          <Text className="text-base font-semibold" style={{ color: colors.primary }}>
-            Create Account
-          </Text>
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );

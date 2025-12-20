@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
-import { colors } from '../constants/colors';
+import { IconButton } from '../components/ui';
 
 export default function AccountScreen() {
   const { logout, loading } = useAuth();
@@ -22,17 +21,13 @@ export default function AccountScreen() {
       </View>
       
       <View className="p-6 pb-8">
-        <TouchableOpacity
+        <IconButton
+          icon="log-out-outline"
+          title={loading ? 'Logging out...' : 'Logout'}
+          variant="danger"
           onPress={handleLogout}
           disabled={loading}
-          className="flex-row items-center justify-center py-4 px-6 rounded-lg"
-          style={{ backgroundColor: colors.error }}
-        >
-          <Ionicons name="log-out-outline" size={24} color={colors.white} />
-          <Text className="ml-2 text-white text-base font-semibold">
-            {loading ? 'Logging out...' : 'Logout'}
-          </Text>
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );
