@@ -8,12 +8,18 @@ import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
 import ForumScreen from '../screens/ForumScreen';
 import CreateScreen from '../screens/CreateScreen';
 import TransparencyScreen from '../screens/TransparencyScreen';
+import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 import AccountScreen from '../screens/AccountScreen';
 import { colors } from '../constants/colors';
 
 export type ComplaintsStackParamList = {
   ComplaintsList: undefined;
   ComplaintDetail: { complaintId: string };
+};
+
+export type TransparencyStackParamList = {
+  ProjectsList: undefined;
+  ProjectDetail: { projectId: string };
 };
 
 export type TabParamList = {
@@ -26,6 +32,7 @@ export type TabParamList = {
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const ComplaintsStack = createNativeStackNavigator<ComplaintsStackParamList>();
+const TransparencyStack = createNativeStackNavigator<TransparencyStackParamList>();
 
 function ComplaintsNavigator() {
   return (
@@ -33,6 +40,15 @@ function ComplaintsNavigator() {
       <ComplaintsStack.Screen name="ComplaintsList" component={ComplaintsScreen} />
       <ComplaintsStack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
     </ComplaintsStack.Navigator>
+  );
+}
+
+function TransparencyNavigator() {
+  return (
+    <TransparencyStack.Navigator screenOptions={{ headerShown: false }}>
+      <TransparencyStack.Screen name="ProjectsList" component={TransparencyScreen} />
+      <TransparencyStack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
+    </TransparencyStack.Navigator>
   );
 }
 
@@ -86,7 +102,7 @@ export default function AuthenticatedTabs() {
       />
       <Tab.Screen 
         name="Transparency" 
-        component={TransparencyScreen}
+        component={TransparencyNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="file-tray-full" size={size} color={color} />

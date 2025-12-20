@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ComplaintsStackParamList } from '../navigation/AuthenticatedTabs';
@@ -197,6 +197,32 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
             </Text>
           </View>
         </View>
+
+        {/* Images Section */}
+        {complaint.images && complaint.images.length > 0 && (
+          <View className="px-4 pb-4">
+            <Text className="text-lg font-semibold mb-2" style={{ color: colors.gray900 }}>
+              Images
+            </Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-4 px-4">
+              <View className="flex-row gap-3">
+                {complaint.images.map((image, index) => (
+                  <View
+                    key={index}
+                    className="rounded-lg overflow-hidden"
+                    style={{ width: 200, height: 150, backgroundColor: colors.gray200 }}
+                  >
+                    <Image
+                      source={{ uri: image.uri }}
+                      className="w-full h-full"
+                      resizeMode="cover"
+                    />
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        )}
 
         {/* Description */}
         <View className="px-4">

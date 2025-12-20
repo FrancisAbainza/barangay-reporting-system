@@ -29,7 +29,7 @@ export interface Complaint {
     latitude: number;
     longitude: number;
   };
-  images: { uri: string }[];
+  images?: { uri: string }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,7 +42,7 @@ export interface CreateComplaintInput {
     latitude: number;
     longitude: number;
   };
-  images: { uri: string }[];
+  images?: { uri: string }[];
 }
 
 export interface UpdateComplaintInput {
@@ -111,6 +111,7 @@ export interface Project {
   endDate?: Date;
   budget?: number;
   location?: ProjectLocation;
+  images?: { uri: string }[];
   createdAt: Date;
   updatedAt: Date;
 }

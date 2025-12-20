@@ -1,10 +1,26 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { TransparencyStackParamList } from '../navigation/AuthenticatedTabs';
+import { ScreenContainer, ScreenHeader, ProjectList } from '../components';
+import { useDummyDb } from '../contexts/DummyDbContext';
+import { Project } from '../types/dummyDb';
 
-export default function TransparencyScreen() {
+type Props = NativeStackScreenProps<TransparencyStackParamList, 'ProjectsList'>;
+
+export default function TransparencyScreen({ navigation }: Props) {
+  const { projects } = useDummyDb();
+
+  const handleProjectPress = (project: Project) => {
+    navigation.navigate('ProjectDetail', { projectId: project.id });
+  };
+
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-xl font-semibold">Transparency Screen</Text>
-    </View>
+    <ScreenContainer scrollable={false} keyboardAvoiding={false}>
+      <ScreenHeader title="Transparency" />
+      <View className="flex-1">
+        <ProjectList projects={projects} onProjectPress={handleProjectPress} />
+      </View>
+    </ScreenContainer>
   );
 }

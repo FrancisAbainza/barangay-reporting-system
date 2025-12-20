@@ -6,3 +6,6 @@ export * from './auth';
 
 // Complaint Components
 export * from './complaints';
+
+// Project Components
+export * from './projects';
