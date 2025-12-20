@@ -30,7 +30,6 @@ src/
 │   ├── SignupScreen.tsx
 │   ├── ComplaintsScreen.tsx
 │   ├── CreateScreen.tsx
-│   ├── ForumScreen.tsx
 │   ├── TransparencyScreen.tsx
 │   └── AccountScreen.tsx
 ├── constants/

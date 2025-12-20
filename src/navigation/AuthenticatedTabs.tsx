@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import ComplaintsScreen from '../screens/ComplaintsScreen';
 import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
-import ForumScreen from '../screens/ForumScreen';
 import CreateScreen from '../screens/CreateScreen';
 import TransparencyScreen from '../screens/TransparencyScreen';
 import ProjectDetailScreen from '../screens/ProjectDetailScreen';
@@ -24,9 +23,9 @@ export type TransparencyStackParamList = {
 
 export type TabParamList = {
   Complaints: undefined;
-  Forum: undefined;
-  Create: undefined;
   Transparency: undefined;
+  Create: undefined;
+  Map: undefined;
   Account: undefined;
 };
 
@@ -52,6 +51,15 @@ function TransparencyNavigator() {
   );
 }
 
+// Temporary Map screen placeholder
+function MapScreen() {
+  return (
+    <View className="flex-1 items-center justify-center bg-white">
+      <Ionicons name="map" size={48} color={colors.gray500} />
+    </View>
+  );
+}
+
 export default function AuthenticatedTabs() {
   return (
     <Tab.Navigator
@@ -70,11 +78,11 @@ export default function AuthenticatedTabs() {
         }}
       />
       <Tab.Screen 
-        name="Forum" 
-        component={ForumScreen}
+        name="Transparency" 
+        component={TransparencyNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbubbles" size={size} color={color} />
+            <Ionicons name="file-tray-full" size={size} color={color} />
           ),
         }}
       />
@@ -101,11 +109,11 @@ export default function AuthenticatedTabs() {
         }}
       />
       <Tab.Screen 
-        name="Transparency" 
-        component={TransparencyNavigator}
+        name="Map" 
+        component={MapScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="file-tray-full" size={size} color={color} />
+            <Ionicons name="map" size={size} color={color} />
           ),
         }}
       />

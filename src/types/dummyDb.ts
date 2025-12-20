@@ -56,26 +56,6 @@ export interface UpdateComplaintInput {
   images?: { uri: string }[];
 }
 
-export interface Forum {
-  id: string;
-  title: string;
-  description: string;
-  authorName: string;
-  authorId: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface CreateForumInput {
-  title: string;
-  description: string;
-}
-
-export interface UpdateForumInput {
-  title?: string;
-  description?: string;
-}
-
 export type ProjectCategory =
   | 'infrastructure'
   | 'health'

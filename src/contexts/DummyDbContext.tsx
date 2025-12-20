@@ -3,9 +3,6 @@ import {
   Complaint,
   CreateComplaintInput,
   UpdateComplaintInput,
-  Forum,
-  CreateForumInput,
-  UpdateForumInput,
   Project,
 } from '../types/dummyDb';
 
@@ -90,54 +87,6 @@ const initialComplaints: Complaint[] = [
     images: [],
     createdAt: new Date('2025-12-19'),
     updatedAt: new Date('2025-12-19'),
-  },
-];
-
-const initialForums: Forum[] = [
-  {
-    id: 'forum-1',
-    title: 'Community Clean-Up Drive This Weekend',
-    description: 'Let\'s organize a clean-up drive this Saturday at 7 AM. Meeting point at the barangay hall. Bring your own gloves and trash bags!',
-    authorName: 'Carlos Mendoza',
-    authorId: 'user-006',
-    createdAt: new Date('2025-12-18'),
-    updatedAt: new Date('2025-12-18'),
-  },
-  {
-    id: 'forum-2',
-    title: 'Basketball League Registration Now Open',
-    description: 'Registration for the annual barangay basketball league is now open. Teams of 10 players can register at the barangay hall until December 30th. Fee: 500 pesos per team.',
-    authorName: 'Mike Torres',
-    authorId: 'user-007',
-    createdAt: new Date('2025-12-16'),
-    updatedAt: new Date('2025-12-16'),
-  },
-  {
-    id: 'forum-3',
-    title: 'Free Medical Check-up Schedule',
-    description: 'The barangay health center will offer free medical check-ups and consultations every Tuesday and Thursday from 9 AM to 12 PM. Please bring your barangay ID.',
-    authorName: 'Dr. Lisa Cruz',
-    authorId: 'user-008',
-    createdAt: new Date('2025-12-15'),
-    updatedAt: new Date('2025-12-15'),
-  },
-  {
-    id: 'forum-4',
-    title: 'Community Garden Initiative',
-    description: 'We are starting a community garden project. If you\'re interested in growing vegetables and herbs together, please join our planning meeting next Monday at 5 PM at the barangay hall.',
-    authorName: 'Elena Ramos',
-    authorId: 'user-009',
-    createdAt: new Date('2025-12-12'),
-    updatedAt: new Date('2025-12-12'),
-  },
-  {
-    id: 'forum-5',
-    title: 'Senior Citizens Monthly Meeting',
-    description: 'Reminder to all senior citizens: Our monthly meeting and social gathering will be held on December 28th at 2 PM. Snacks will be provided.',
-    authorName: 'Gloria Santiago',
-    authorId: 'user-010',
-    createdAt: new Date('2025-12-10'),
-    updatedAt: new Date('2025-12-10'),
   },
 ];
 
@@ -268,13 +217,6 @@ interface DummyDbContextType {
   updateComplaint: (id: string, input: UpdateComplaintInput) => Complaint | null;
   deleteComplaint: (id: string) => boolean;
 
-  // Forums state and operations
-  forums: Forum[];
-  createForum: (input: CreateForumInput) => Forum;
-  getForum: (id: string) => Forum | undefined;
-  updateForum: (id: string, input: UpdateForumInput) => Forum | null;
-  deleteForum: (id: string) => boolean;
-
   // Projects state (read-only)
   projects: Project[];
   getProject: (id: string) => Project | undefined;
@@ -284,7 +226,6 @@ const DummyDbContext = createContext<DummyDbContextType | undefined>(undefined);
 
 export const DummyDbProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [complaints, setComplaints] = useState<Complaint[]>(initialComplaints);
-  const [forums, setForums] = useState<Forum[]>(initialForums);
   const [projects] = useState<Project[]>(initialProjects);
 
   // Complaint CRUD operations
@@ -341,56 +282,6 @@ export const DummyDbProvider: React.FC<{ children: ReactNode }> = ({ children })
     return deleted;
   };
 
-  // Forum CRUD operations
-  const createForum = (input: CreateForumInput): Forum => {
-    const newForum: Forum = {
-      id: `forum-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title: input.title,
-      description: input.description,
-      authorName: 'Anonymous User', // Dummy data
-      authorId: `user-${Math.floor(Math.random() * 1000)}`, // Dummy data
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    setForums((prev) => [newForum, ...prev]);
-    return newForum;
-  };
-
-  const getForum = (id: string): Forum | undefined => {
-    return forums.find((forum) => forum.id === id);
-  };
-
-  const updateForum = (id: string, input: UpdateForumInput): Forum | null => {
-    let updatedForum: Forum | null = null;
-
-    setForums((prev) =>
-      prev.map((forum) => {
-        if (forum.id === id) {
-          updatedForum = {
-            ...forum,
-            ...input,
-            updatedAt: new Date(),
-          };
-          return updatedForum;
-        }
-        return forum;
-      })
-    );
-
-    return updatedForum;
-  };
-
-  const deleteForum = (id: string): boolean => {
-    let deleted = false;
-    setForums((prev) => {
-      const filtered = prev.filter((forum) => forum.id !== id);
-      deleted = filtered.length < prev.length;
-      return filtered;
-    });
-    return deleted;
-  };
-
   // Project read operations
   const getProject = (id: string): Project | undefined => {
     return projects.find((project) => project.id === id);
@@ -402,11 +293,6 @@ export const DummyDbProvider: React.FC<{ children: ReactNode }> = ({ children })
     getComplaint,
     updateComplaint,
     deleteComplaint,
-    forums,
-    createForum,
-    getForum,
-    updateForum,
-    deleteForum,
     projects,
     getProject,
   };
