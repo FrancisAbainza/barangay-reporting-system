@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
+import { Button } from '../components/ui';
 import { 
   getCurrentPositionAsync,
   useForegroundPermissions,
@@ -158,7 +159,7 @@ export default function MapPickerScreen() {
 
         <TouchableOpacity
           onPress={getCurrentLocation}
-          className="p-2 rounded-lg"
+          className="p-2 rounded-lg active:opacity-70"
           style={{ backgroundColor: colors.primaryLight }}
         >
           <Ionicons name="locate" size={24} color={colors.white} />
@@ -189,15 +190,11 @@ export default function MapPickerScreen() {
           </Text>
         </View>
 
-        <TouchableOpacity
+        <Button
           onPress={handleConfirm}
-          className="py-4 rounded-lg items-center"
-          style={{ backgroundColor: colors.primary }}
-        >
-          <Text className="text-base font-semibold" style={{ color: colors.white }}>
-            Confirm Location
-          </Text>
-        </TouchableOpacity>
+          title="Confirm Location"
+          variant="primary"
+        />
       </View>
     </View>
   );

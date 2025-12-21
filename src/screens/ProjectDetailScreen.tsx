@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, Image, TextInput, Dimensions, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Button, IconButton } from '../components/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { TransparencyStackParamList } from '../navigation/AuthenticatedTabs';
 import { colors } from '../constants/colors';
@@ -367,7 +368,7 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
                   style={{ width: '100%', height: 150, borderRadius: 8, marginBottom: 12 }}
                   resizeMode="cover"
                 />
-                <Pressable
+                <IconButton
                   onPress={() => {
                     navigation.navigate('MapView', {
                       latitude: project.location!.latitude,
@@ -376,14 +377,10 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
                       address: address,
                     });
                   }}
-                  className="flex-row items-center justify-center py-3 rounded-lg active:opacity-70"
-                  style={{ backgroundColor: colors.primary }}
-                >
-                  <Ionicons name="map" size={20} color={colors.white} />
-                  <Text className="text-base font-semibold ml-2" style={{ color: colors.white }}>
-                    View on Map
-                  </Text>
-                </Pressable>
+                  icon="map"
+                  title="View on Map"
+                  variant="primary"
+                />
               </View>
             </View>
           )}
@@ -409,15 +406,11 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
               className="text-base mb-3"
               style={{ color: colors.gray900, minHeight: 80 }}
             />
-            <Pressable
+            <Button
               onPress={handleSubmitComment}
-              className="self-end px-6 py-2 rounded-lg active:opacity-70"
-              style={{ backgroundColor: colors.primary }}
-            >
-              <Text className="text-base font-semibold" style={{ color: colors.white }}>
-                Post Comment
-              </Text>
-            </Pressable>
+              title="Post Comment"
+              variant="primary"
+            />
           </View>
         </View>
 
