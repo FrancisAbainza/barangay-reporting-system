@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, View, Text, TouchableOpacity } from 'react-native';
+import { Alert, View, Text, TouchableOpacity, Image } from 'react-native';
 import {
   getCurrentPositionAsync,
   useForegroundPermissions,
   PermissionStatus,
+  reverseGeocodeAsync,
 } from 'expo-location';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,6 +12,7 @@ import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../constants/colors';
 import { CreateStackParamList } from '../../navigation/AuthenticatedTabs';
+import { getMapPreview, fetchAddress } from '../../utils/mapUtils';
 
 interface Location {
   latitude: number;
@@ -46,14 +48,22 @@ export function LocationPicker({
 
   // Handle location from map picker
   useEffect(() => {
-    if (isFocused && route.params?.pickedLatitude && route.params?.pickedLongitude) {
-      const mapPickedLocation: Location = {
-        latitude: route.params.pickedLatitude,
-        longitude: route.params.pickedLongitude,
-        address: `${route.params.pickedLatitude.toFixed(4)}, ${route.params.pickedLongitude.toFixed(4)}`,
-      };
-      setPickedLocation(mapPickedLocation);
+    async function handleMapPickedLocation() {
+      if (isFocused && route.params?.pickedLatitude && route.params?.pickedLongitude) {
+        const latitude = route.params.pickedLatitude;
+        const longitude = route.params.pickedLongitude;
+        
+        const address = await fetchAddress(latitude, longitude);
+        
+        setPickedLocation({
+          latitude,
+          longitude,
+          address,
+        });
+      }
     }
+
+    handleMapPickedLocation();
   }, [route.params, isFocused]);
 
   useEffect(() => {
@@ -99,13 +109,16 @@ export function LocationPicker({
         accuracy: 6,
       });
 
-      const newLocation: Location = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        address: 'Current Location',
-      };
+      const latitude = location.coords.latitude;
+      const longitude = location.coords.longitude;
 
-      setPickedLocation(newLocation);
+      const address = await fetchAddress(latitude, longitude);
+
+      setPickedLocation({
+        latitude,
+        longitude,
+        address,
+      });
     } catch (err) {
       Alert.alert(
         'Error',
@@ -142,6 +155,12 @@ export function LocationPicker({
           className="border rounded-lg p-4 mb-2"
           style={{ borderColor: error ? colors.error : colors.border }}
         >
+          <Image
+            source={{ uri: getMapPreview(pickedLocation.latitude, pickedLocation.longitude) }}
+            className="w-full h-40 rounded-lg mb-3"
+            resizeMode="cover"
+          />
+
           <View className="flex-row items-center mb-3">
             <Ionicons
               name="location"
@@ -153,7 +172,7 @@ export function LocationPicker({
               className="flex-1 text-base"
               style={{ color: colors.textPrimary }}
             >
-              {pickedLocation.address || `${pickedLocation.latitude.toFixed(4)}, ${pickedLocation.longitude.toFixed(4)}`}
+              {pickedLocation.address}
             </Text>
           </View>
 

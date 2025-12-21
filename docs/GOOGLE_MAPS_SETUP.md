@@ -4,39 +4,47 @@ The location picker uses Google Maps to allow users to select and adjust their l
 
 ## Configuration Required
 
-To use the map picker functionality, you need to add your Google Maps API keys:
+To use the map picker functionality, you need to add your Google Maps API key securely using environment variables.
 
-### 1. Get API Keys
+### 1. Get API Key
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
 3. Enable the following APIs:
    - Maps SDK for Android
    - Maps SDK for iOS
-4. Create API keys for both Android and iOS
+4. Create an API key (can be used for both Android and iOS)
 
-### 2. Add API Keys to app.json
+### 2. Add API Key to .env
 
-Open `app.json` and replace the placeholder API keys:
+**✅ Secure Method (Recommended)**
 
-```json
-"ios": {
-  "config": {
-    "googleMapsApiKey": "YOUR_ACTUAL_IOS_API_KEY"
-  }
-},
-"android": {
-  "config": {
-    "googleMaps": {
-      "apiKey": "YOUR_ACTUAL_ANDROID_API_KEY"
-    }
-  }
-}
+Create or update the `.env` file in the root directory:
+
+```bash
+GOOGLE_MAPS_API_KEY=your_actual_api_key_here
 ```
 
-### 3. Restart Expo
+**Important:** The `.env` file is already gitignored and will NOT be committed to version control.
 
-After adding your API keys, restart the Expo development server:
+For other developers, copy `.env.example` to `.env` and add your own key.
+
+### 3. Restrict Your API Key (CRITICAL)
+
+⚠️ **This step is mandatory to prevent unauthorized usage and unexpected billing:**
+
+1. Go to [Google Cloud Console - Credentials](https://console.cloud.google.com/apis/credentials)
+2. Select your API key
+3. Add **API restrictions:**
+   - Maps SDK for Android
+   - Maps SDK for iOS
+4. Add **Application restrictions:**
+   - Android: Add your package name + SHA-1 certificate fingerprint
+   - iOS: Add your bundle identifier
+
+### 4. Restart Expo
+
+After adding your API key, restart the Expo development server:
 
 ```bash
 npm start
@@ -62,3 +70,14 @@ The LocationPicker component is already integrated into the ComplaintForm and wi
 - For development/testing without real API keys, the map will show a default location (Manila, Philippines)
 - Location permissions are required to use the "Current Location" feature
 - The map picker is part of the Create navigation stack for a seamless user experience
+
+## Security
+
+✅ **This setup is secure:**
+- API keys are stored in `.env` (not committed to Git)
+- Keys are injected at build time via `app.config.ts`
+- No hardcoded keys in the codebase
+
+❌ **Never commit:**
+- `.env` file
+- API keys directly in code files

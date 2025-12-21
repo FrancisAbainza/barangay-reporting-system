@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { 
   getCurrentPositionAsync,
   useForegroundPermissions,
-  PermissionStatus 
+  PermissionStatus,
+  reverseGeocodeAsync
 } from 'expo-location';
 import { colors } from '../constants/colors';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CreateStackParamList } from '../navigation/AuthenticatedTabs';
+import { fetchAddress } from '../utils/mapUtils';
 
 type MapPickerRouteProp = RouteProp<CreateStackParamList, 'MapPicker'>;
 type MapPickerNavigationProp = NativeStackNavigationProp<CreateStackParamList, 'MapPicker'>;
@@ -31,8 +33,18 @@ export default function MapPickerScreen() {
     longitude: route.params?.initialLongitude || 121.102873,
   });
 
+  const [address, setAddress] = useState<string>('');
+
   const [locationPermissionInformation, requestPermission] =
     useForegroundPermissions();
+
+  useEffect(() => {
+    async function loadInitialAddress() {
+      const address = await fetchAddress(markerPosition.latitude, markerPosition.longitude);
+      setAddress(address);
+    }
+    loadInitialAddress();
+  }, []);
 
   async function verifyPermissions() {
     if (!locationPermissionInformation) {
@@ -80,17 +92,22 @@ export default function MapPickerScreen() {
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       });
+      const address = await fetchAddress(newPosition.latitude, newPosition.longitude);
+      setAddress(address);
     } catch (error) {
       Alert.alert('Error', 'Failed to get your location. Please try again.');
     }
   }
 
-  function handleMapPress(event: any) {
+  async function handleMapPress(event: any) {
     const coordinate = event.nativeEvent.coordinate;
-    setMarkerPosition({
+    const newPosition = {
       latitude: coordinate.latitude,
       longitude: coordinate.longitude,
-    });
+    };
+    setMarkerPosition(newPosition);
+    const address = await fetchAddress(newPosition.latitude, newPosition.longitude);
+    setAddress(address);
   }
 
   function handleConfirm() {
@@ -112,11 +129,14 @@ export default function MapPickerScreen() {
         <Marker
           coordinate={markerPosition}
           draggable
-          onDragEnd={(e) => {
-            setMarkerPosition({
+          onDragEnd={async (e) => {
+            const newPosition = {
               latitude: e.nativeEvent.coordinate.latitude,
               longitude: e.nativeEvent.coordinate.longitude,
-            });
+            };
+            setMarkerPosition(newPosition);
+            const address = await fetchAddress(newPosition.latitude, newPosition.longitude);
+            setAddress(address);
           }}
         />
       </MapView>
@@ -165,7 +185,7 @@ export default function MapPickerScreen() {
             style={{ marginRight: 8 }}
           />
           <Text className="text-sm flex-1" style={{ color: colors.textSecondary }}>
-            {markerPosition.latitude.toFixed(6)}, {markerPosition.longitude.toFixed(6)}
+            {address || `${markerPosition.latitude.toFixed(6)}, ${markerPosition.longitude.toFixed(6)}`}
           </Text>
         </View>
 
