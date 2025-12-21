@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import ComplaintsScreen from '../screens/ComplaintsScreen';
 import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
+import MapViewScreen from '../screens/MapViewScreen';
 import CreateScreen from '../screens/CreateScreen';
 import MapPickerScreen from '../screens/MapPickerScreen';
 import TransparencyScreen from '../screens/TransparencyScreen';
@@ -15,11 +16,23 @@ import { colors } from '../constants/colors';
 export type ComplaintsStackParamList = {
   ComplaintsList: undefined;
   ComplaintDetail: { complaintId: string };
+  MapView: {
+    latitude: number;
+    longitude: number;
+    title?: string;
+    address?: string;
+  };
 };
 
 export type TransparencyStackParamList = {
   ProjectsList: undefined;
   ProjectDetail: { projectId: string };
+  MapView: {
+    latitude: number;
+    longitude: number;
+    title?: string;
+    address?: string;
+  };
 };
 
 export type CreateStackParamList = {
@@ -51,6 +64,7 @@ function ComplaintsNavigator() {
     <ComplaintsStack.Navigator screenOptions={{ headerShown: false }}>
       <ComplaintsStack.Screen name="ComplaintsList" component={ComplaintsScreen} />
       <ComplaintsStack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
+      <ComplaintsStack.Screen name="MapView" component={MapViewScreen} />
     </ComplaintsStack.Navigator>
   );
 }
@@ -60,6 +74,7 @@ function TransparencyNavigator() {
     <TransparencyStack.Navigator screenOptions={{ headerShown: false }}>
       <TransparencyStack.Screen name="ProjectsList" component={TransparencyScreen} />
       <TransparencyStack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
+      <TransparencyStack.Screen name="MapView" component={MapViewScreen} />
     </TransparencyStack.Navigator>
   );
 }

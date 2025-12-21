@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, Image, TextInput, Dimensions, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ComplaintsStackParamList } from '../navigation/AuthenticatedTabs';
 import { colors } from '../constants/colors';
 import { useDummyDb } from '../contexts/DummyDbContext';
+import { getMapPreview, fetchAddress } from '../utils/mapUtils';
 
 type Props = NativeStackScreenProps<ComplaintsStackParamList, 'ComplaintDetail'>;
 
@@ -77,7 +78,18 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
   const complaint = getComplaint(complaintId);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [commentText, setCommentText] = useState('');
+  const [address, setAddress] = useState<string>('');
   const screenWidth = Dimensions.get('window').width;
+
+  useEffect(() => {
+    async function loadAddress() {
+      if (complaint) {
+        const fetchedAddress = await fetchAddress(complaint.location.latitude, complaint.location.longitude);
+        setAddress(fetchedAddress);
+      }
+    }
+    loadAddress();
+  }, [complaint]);
   
   if (!complaint) {
     return (
@@ -271,15 +283,41 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
             className="p-4 rounded-lg"
             style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
           >
-            <View className="flex-row items-center">
+            <View className="flex-row items-center mb-3">
               <Ionicons name="location" size={20} color={colors.primary} />
               <Text className="ml-2 text-sm font-medium" style={{ color: colors.gray500 }}>
                 Location
               </Text>
             </View>
-            <Text className="text-base mt-1 ml-7" style={{ color: colors.gray900 }}>
-              {complaint.location.latitude.toFixed(4)}, {complaint.location.longitude.toFixed(4)}
-            </Text>
+            <View>
+              {address && (
+                <Text className="text-base mb-3" style={{ color: colors.gray900 }}>
+                  {address}
+                </Text>
+              )}
+              <Image
+                source={{ uri: getMapPreview(complaint.location.latitude, complaint.location.longitude) }}
+                style={{ width: '100%', height: 150, borderRadius: 8, marginBottom: 12 }}
+                resizeMode="cover"
+              />
+              <Pressable
+                onPress={() => {
+                  navigation.navigate('MapView', {
+                    latitude: complaint.location.latitude,
+                    longitude: complaint.location.longitude,
+                    title: complaint.title,
+                    address: address,
+                  });
+                }}
+                className="flex-row items-center justify-center py-3 rounded-lg active:opacity-70"
+                style={{ backgroundColor: colors.primary }}
+              >
+                <Ionicons name="map" size={20} color={colors.white} />
+                <Text className="text-base font-semibold ml-2" style={{ color: colors.white }}>
+                  View on Map
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </View>
 

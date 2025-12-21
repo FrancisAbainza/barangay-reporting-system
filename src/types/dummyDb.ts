@@ -39,6 +39,7 @@ export interface Complaint {
   location: {
     latitude: number;
     longitude: number;
+    address?: string;
   };
   images?: { uri: string }[];
   likes?: string[]; // userIds who liked
@@ -92,7 +93,6 @@ export type ProjectStatus =
 export interface ProjectLocation {
   latitude: number;
   longitude: number;
-  address?: string;
 }
 
 export interface Project {
