@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, Pressable, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Pressable, Image, TextInput, Dimensions, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { TransparencyStackParamList } from '../navigation/AuthenticatedTabs';
@@ -91,6 +91,9 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
   const { projectId } = route.params;
   const { getProject } = useDummyDb();
   const project = getProject(projectId);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [commentText, setCommentText] = useState('');
+  const screenWidth = Dimensions.get('window').width;
   
   if (!project) {
     return (
@@ -103,6 +106,14 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
   }
   
   const statusColor = getStatusColor(project.status);
+
+  const handleSubmitComment = () => {
+    if (commentText.trim()) {
+      // TODO: Implement comment submission
+      console.log('Submitting comment:', commentText);
+      setCommentText('');
+    }
+  };
 
   return (
     <View className="flex-1 bg-white">
@@ -123,23 +134,97 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
       </View>
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
-        {/* Status Badge */}
-        <View className="px-4 pt-4 pb-3">
+        {/* Title and Status */}
+        <View className="px-4 pt-4 pb-4">
+          <View className="flex-row items-start justify-between">
+            <Text className="text-2xl font-bold flex-1 mr-3" style={{ color: colors.gray900 }}>
+              {project.title}
+            </Text>
+            <View
+              className="px-4 py-2 rounded-full"
+              style={{ backgroundColor: `${statusColor}15` }}
+            >
+              <Text className="text-sm font-semibold" style={{ color: statusColor }}>
+                {getStatusLabel(project.status)}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Image Carousel */}
+        {project.images && project.images.length > 0 && (
+          <View className="mb-4">
+            <FlatList
+              data={project.images}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={(event) => {
+                const index = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
+                setCurrentImageIndex(index);
+              }}
+              renderItem={({ item }) => (
+                <View style={{ width: screenWidth, height: screenWidth * 0.75 }}>
+                  <Image
+                    source={{ uri: item.uri }}
+                    style={{ width: '100%', height: '100%' }}
+                    resizeMode="cover"
+                  />
+                </View>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+            {project.images.length > 1 && (
+              <View className="absolute bottom-4 self-center flex-row gap-2">
+                {project.images.map((_, index) => (
+                  <View
+                    key={index}
+                    className="w-2 h-2 rounded-full"
+                    style={{
+                      backgroundColor: index === currentImageIndex ? colors.white : 'rgba(255,255,255,0.5)',
+                    }}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Description */}
+        <View className="px-4 pb-4">
+          <Text className="text-lg font-semibold mb-2" style={{ color: colors.gray900 }}>
+            Description
+          </Text>
           <View
-            className="self-start px-4 py-2 rounded-full"
-            style={{ backgroundColor: `${statusColor}15` }}
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
           >
-            <Text className="text-sm font-semibold" style={{ color: statusColor }}>
-              {getStatusLabel(project.status)}
+            <Text className="text-base leading-6" style={{ color: colors.gray700 }}>
+              {project.description}
             </Text>
           </View>
         </View>
 
-        {/* Title */}
+        {/* Voting Section */}
         <View className="px-4 pb-4">
-          <Text className="text-2xl font-bold" style={{ color: colors.gray900 }}>
-            {project.title}
-          </Text>
+          <View
+            className="flex-row items-center justify-around py-3 rounded-lg"
+            style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
+          >
+            <Pressable className="flex-row items-center px-4 py-2 active:opacity-70">
+              <Ionicons name="thumbs-up-outline" size={24} color={colors.success} />
+              <Text className="text-base font-semibold ml-2" style={{ color: colors.gray900 }}>
+                {project.likes?.length || 0}
+              </Text>
+            </Pressable>
+            <View style={{ width: 1, height: 30, backgroundColor: colors.gray300 }} />
+            <Pressable className="flex-row items-center px-4 py-2 active:opacity-70">
+              <Ionicons name="thumbs-down-outline" size={24} color={colors.error} />
+              <Text className="text-base font-semibold ml-2" style={{ color: colors.gray900 }}>
+                {project.dislikes?.length || 0}
+              </Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Info Cards */}
@@ -174,6 +259,42 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
               </View>
               <Text className="text-base mt-1 ml-7 font-semibold" style={{ color: colors.primary }}>
                 {formatCurrency(project.budget)}
+              </Text>
+            </View>
+          )}
+
+          {/* Contractor */}
+          {project.contractor && (
+            <View
+              className="p-4 rounded-lg"
+              style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
+            >
+              <View className="flex-row items-center">
+                <Ionicons name="briefcase" size={20} color={colors.primary} />
+                <Text className="ml-2 text-sm font-medium" style={{ color: colors.gray500 }}>
+                  Contractor
+                </Text>
+              </View>
+              <Text className="text-base mt-1 ml-7" style={{ color: colors.gray900 }}>
+                {project.contractor}
+              </Text>
+            </View>
+          )}
+
+          {/* Source of Funds */}
+          {project.sourceOfFunds && (
+            <View
+              className="p-4 rounded-lg"
+              style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
+            >
+              <View className="flex-row items-center">
+                <Ionicons name="wallet" size={20} color={colors.primary} />
+                <Text className="ml-2 text-sm font-medium" style={{ color: colors.gray500 }}>
+                  Source of Funds
+                </Text>
+              </View>
+              <Text className="text-base mt-1 ml-7" style={{ color: colors.gray900 }}>
+                {project.sourceOfFunds}
               </Text>
             </View>
           )}
@@ -236,67 +357,104 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
           )}
         </View>
 
-        {/* Images Section */}
-        {project.images && project.images.length > 0 && (
-          <View className="px-4 pb-4">
-            <Text className="text-lg font-semibold mb-2" style={{ color: colors.gray900 }}>
-              Images
-            </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-4 px-4">
-              <View className="flex-row gap-3">
-                {project.images.map((image, index) => (
-                  <View
-                    key={index}
-                    className="rounded-lg overflow-hidden"
-                    style={{ width: 200, height: 150, backgroundColor: colors.gray200 }}
-                  >
-                    <Image
-                      source={{ uri: image.uri }}
-                      className="w-full h-full"
-                      resizeMode="cover"
-                    />
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-          </View>
-        )}
-
-        {/* Description Section */}
-        <View className="px-4 pb-4">
-          <Text className="text-lg font-semibold mb-2" style={{ color: colors.gray900 }}>
-            Description
+        {/* Comment Input */}
+        <View className="px-4 mt-6">
+          <Text className="text-base font-semibold mb-2" style={{ color: colors.gray900 }}>
+            Add a Comment
           </Text>
           <View
-            className="p-4 rounded-lg"
+            className="p-3 rounded-lg"
             style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
           >
-            <Text className="text-base leading-6" style={{ color: colors.gray700 }}>
-              {project.description}
-            </Text>
+            <TextInput
+              placeholder="Write your comment here..."
+              placeholderTextColor={colors.gray400}
+              value={commentText}
+              onChangeText={setCommentText}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+              className="text-base mb-3"
+              style={{ color: colors.gray900, minHeight: 80 }}
+            />
+            <Pressable
+              onPress={handleSubmitComment}
+              className="self-end px-6 py-2 rounded-lg active:opacity-70"
+              style={{ backgroundColor: colors.primary }}
+            >
+              <Text className="text-base font-semibold" style={{ color: colors.white }}>
+                Post Comment
+              </Text>
+            </Pressable>
           </View>
         </View>
 
-        {/* Timestamps */}
-        <View className="px-4">
-          <View
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
-          >
-            <View className="flex-row items-center mb-2">
-              <Ionicons name="time" size={16} color={colors.gray400} />
-              <Text className="text-xs ml-2" style={{ color: colors.gray500 }}>
-                Created: {formatDate(project.createdAt)}
-              </Text>
-            </View>
-            <View className="flex-row items-center">
-              <Ionicons name="refresh" size={16} color={colors.gray400} />
-              <Text className="text-xs ml-2" style={{ color: colors.gray500 }}>
-                Last Updated: {formatDate(project.updatedAt)}
-              </Text>
+        {/* Comments Section */}
+        {project.comments && project.comments.length > 0 && (
+          <View className="px-4 mt-6">
+            <Text className="text-lg font-semibold mb-3" style={{ color: colors.gray900 }}>
+              Comments ({project.comments.length})
+            </Text>
+            <View className="gap-3">
+              {project.comments.map((comment) => (
+                <View
+                  key={comment.id}
+                  className="p-4 rounded-lg"
+                  style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
+                >
+                  {/* Comment Header */}
+                  <View className="flex-row items-center justify-between mb-2">
+                    <View className="flex-row items-center flex-1">
+                      <View
+                        className="w-8 h-8 rounded-full items-center justify-center"
+                        style={{ backgroundColor: colors.primary }}
+                      >
+                        <Text className="text-sm font-semibold" style={{ color: colors.white }}>
+                          {comment.userName.charAt(0).toUpperCase()}
+                        </Text>
+                      </View>
+                      <View className="ml-2 flex-1">
+                        <Text className="text-sm font-semibold" style={{ color: colors.gray900 }}>
+                          {comment.userName}
+                        </Text>
+                        <Text className="text-xs" style={{ color: colors.gray400 }}>
+                          {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Comment Content */}
+                  <Text className="text-base mb-3" style={{ color: colors.gray700 }}>
+                    {comment.content}
+                  </Text>
+
+                  {/* Comment Voting */}
+                  <View className="flex-row items-center gap-4">
+                    <Pressable className="flex-row items-center active:opacity-70">
+                      <Ionicons name="thumbs-up-outline" size={18} color={colors.success} />
+                      <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
+                        {comment.likes?.length || 0}
+                      </Text>
+                    </Pressable>
+                    <Pressable className="flex-row items-center active:opacity-70">
+                      <Ionicons name="thumbs-down-outline" size={18} color={colors.error} />
+                      <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
+                        {comment.dislikes?.length || 0}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              ))}
             </View>
           </View>
-        </View>
+        )}
       </ScrollView>
     </View>
   );

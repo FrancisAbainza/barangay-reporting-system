@@ -101,8 +101,8 @@ export function ComplaintCard({ complaint, onPress }: ComplaintCardProps) {
         {complaint.description}
       </Text>
 
-      <View className="flex-row items-center justify-between ml-13">
-        <View className="flex-row items-center">
+      <View className="flex-row items-center justify-between ml-13 mb-2">
+        <View className="flex-row items-center gap-2">
           <View
             className="px-3 py-1 rounded-full"
             style={{ backgroundColor: `${statusColor}15` }}
@@ -111,12 +111,36 @@ export function ComplaintCard({ complaint, onPress }: ComplaintCardProps) {
               {statusLabel}
             </Text>
           </View>
+          <View className="flex-row items-center">
+            <Ionicons name="calendar-outline" size={14} color={colors.gray500} />
+            <Text className="text-xs ml-1" style={{ color: colors.gray500 }}>
+              {new Date(complaint.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </Text>
+          </View>
         </View>
+      </View>
 
+      {/* Engagement Stats */}
+      <View 
+        className="flex-row items-center ml-13 pt-2 gap-4"
+        style={{ borderTopWidth: 1, borderTopColor: colors.gray200 }}
+      >
         <View className="flex-row items-center">
-          <Ionicons name="time-outline" size={14} color={colors.gray400} />
-          <Text className="text-xs ml-1" style={{ color: colors.gray400 }}>
-            {new Date(complaint.createdAt).toLocaleDateString()}
+          <Ionicons name="thumbs-up" size={14} color={colors.success} />
+          <Text className="text-xs ml-1" style={{ color: colors.gray600 }}>
+            {complaint.likes?.length || 0}
+          </Text>
+        </View>
+        <View className="flex-row items-center">
+          <Ionicons name="thumbs-down" size={14} color={colors.error} />
+          <Text className="text-xs ml-1" style={{ color: colors.gray600 }}>
+            {complaint.dislikes?.length || 0}
+          </Text>
+        </View>
+        <View className="flex-row items-center">
+          <Ionicons name="chatbubble-outline" size={14} color={colors.info} />
+          <Text className="text-xs ml-1" style={{ color: colors.gray600 }}>
+            {complaint.comments?.length || 0}
           </Text>
         </View>
       </View>

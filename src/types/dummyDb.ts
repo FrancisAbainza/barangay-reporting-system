@@ -17,6 +17,17 @@ export type ComplaintStatus =
   | 'resolved'
   | 'dismissed';
 
+export interface Comment {
+  id: string;
+  userId: string;
+  userName: string;
+  content: string;
+  likes?: string[]; // userIds who liked
+  dislikes?: string[]; // userIds who disliked
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Complaint {
   id: string;
   title: string;
@@ -30,6 +41,9 @@ export interface Complaint {
     longitude: number;
   };
   images?: { uri: string }[];
+  likes?: string[]; // userIds who liked
+  dislikes?: string[]; // userIds who disliked
+  comments?: Comment[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -90,8 +104,13 @@ export interface Project {
   startDate: Date;
   endDate?: Date;
   budget?: number;
+  contractor?: string;
+  sourceOfFunds?: string;
   location?: ProjectLocation;
   images?: { uri: string }[];
+  likes?: string[]; // userIds who liked
+  dislikes?: string[]; // userIds who disliked
+  comments?: Comment[];
   createdAt: Date;
   updatedAt: Date;
 }

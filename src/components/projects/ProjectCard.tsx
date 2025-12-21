@@ -109,27 +109,51 @@ export function ProjectCard({ project, onPress }: ProjectCardProps) {
         {project.description}
       </Text>
 
-      <View className="flex-row items-center justify-between ml-13">
-        <View className="flex-row items-center">
+      <View className="flex-row items-center justify-between ml-13 mb-2">
+        <View className="flex-row items-center gap-2">
           <View
-            className="px-2 py-1 rounded-md"
-            style={{ backgroundColor: statusColor }}
+            className="px-3 py-1 rounded-full"
+            style={{ backgroundColor: `${statusColor}15` }}
           >
-            <Text className="text-xs font-medium" style={{ color: colors.white }}>
+            <Text className="text-xs font-medium" style={{ color: statusColor }}>
               {statusLabel}
             </Text>
           </View>
-          {project.budget && (
-            <Text className="text-xs ml-2 font-medium" style={{ color: colors.primary }}>
-              {formatCurrency(project.budget)}
+          <View className="flex-row items-center">
+            <Ionicons name="calendar-outline" size={14} color={colors.gray500} />
+            <Text className="text-xs ml-1" style={{ color: colors.gray500 }}>
+              {new Date(project.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </Text>
-          )}
+          </View>
         </View>
+        {project.budget && (
+          <Text className="text-xs font-medium" style={{ color: colors.primary }}>
+            {formatCurrency(project.budget)}
+          </Text>
+        )}
+      </View>
 
+      {/* Engagement Stats */}
+      <View 
+        className="flex-row items-center ml-13 pt-2 gap-4"
+        style={{ borderTopWidth: 1, borderTopColor: colors.gray200 }}
+      >
         <View className="flex-row items-center">
-          <Ionicons name="calendar-outline" size={14} color={colors.gray500} />
-          <Text className="text-xs ml-1" style={{ color: colors.gray500 }}>
-            {project.startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+          <Ionicons name="thumbs-up" size={14} color={colors.success} />
+          <Text className="text-xs ml-1" style={{ color: colors.gray600 }}>
+            {project.likes?.length || 0}
+          </Text>
+        </View>
+        <View className="flex-row items-center">
+          <Ionicons name="thumbs-down" size={14} color={colors.error} />
+          <Text className="text-xs ml-1" style={{ color: colors.gray600 }}>
+            {project.dislikes?.length || 0}
+          </Text>
+        </View>
+        <View className="flex-row items-center">
+          <Ionicons name="chatbubble-outline" size={14} color={colors.info} />
+          <Text className="text-xs ml-1" style={{ color: colors.gray600 }}>
+            {project.comments?.length || 0}
           </Text>
         </View>
       </View>
