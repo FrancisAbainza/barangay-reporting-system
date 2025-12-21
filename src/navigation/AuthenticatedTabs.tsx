@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ComplaintsScreen from '../screens/ComplaintsScreen';
 import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
 import CreateScreen from '../screens/CreateScreen';
+import MapPickerScreen from '../screens/MapPickerScreen';
 import TransparencyScreen from '../screens/TransparencyScreen';
 import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 import AccountScreen from '../screens/AccountScreen';
@@ -21,6 +22,17 @@ export type TransparencyStackParamList = {
   ProjectDetail: { projectId: string };
 };
 
+export type CreateStackParamList = {
+  CreateForm: {
+    pickedLatitude?: number;
+    pickedLongitude?: number;
+  };
+  MapPicker: {
+    initialLatitude?: number;
+    initialLongitude?: number;
+  };
+};
+
 export type TabParamList = {
   Complaints: undefined;
   Transparency: undefined;
@@ -32,6 +44,7 @@ export type TabParamList = {
 const Tab = createBottomTabNavigator<TabParamList>();
 const ComplaintsStack = createNativeStackNavigator<ComplaintsStackParamList>();
 const TransparencyStack = createNativeStackNavigator<TransparencyStackParamList>();
+const CreateStack = createNativeStackNavigator<CreateStackParamList>();
 
 function ComplaintsNavigator() {
   return (
@@ -48,6 +61,15 @@ function TransparencyNavigator() {
       <TransparencyStack.Screen name="ProjectsList" component={TransparencyScreen} />
       <TransparencyStack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
     </TransparencyStack.Navigator>
+  );
+}
+
+function CreateNavigator() {
+  return (
+    <CreateStack.Navigator screenOptions={{ headerShown: false }}>
+      <CreateStack.Screen name="CreateForm" component={CreateScreen} />
+      <CreateStack.Screen name="MapPicker" component={MapPickerScreen} />
+    </CreateStack.Navigator>
   );
 }
 
@@ -88,7 +110,7 @@ export default function AuthenticatedTabs() {
       />
       <Tab.Screen 
         name="Create" 
-        component={CreateScreen}
+        component={CreateNavigator}
         options={{
           tabBarIcon: ({ focused }) => (
             <View

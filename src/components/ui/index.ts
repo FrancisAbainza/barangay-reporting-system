@@ -3,3 +3,5 @@ export { FormField } from './FormField';
 export { ScreenHeader } from './ScreenHeader';
 export { ScreenContainer } from './ScreenContainer';
 export { IconButton } from './IconButton';
+export { ImagePickerComponent } from './ImagePicker';
+export { LocationPicker } from './LocationPicker';
