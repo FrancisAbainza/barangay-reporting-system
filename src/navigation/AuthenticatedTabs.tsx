@@ -1,5 +1,4 @@
 import React from 'react';
-import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,7 +10,9 @@ import MapPickerScreen from '../screens/MapPickerScreen';
 import TransparencyScreen from '../screens/TransparencyScreen';
 import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 import AccountScreen from '../screens/AccountScreen';
+import MapScreen from '../screens/MapScreen';
 import { colors } from '../constants/colors';
+import { View } from 'react-native';
 
 export type ComplaintsStackParamList = {
   ComplaintsList: undefined;
@@ -85,15 +86,6 @@ function CreateNavigator() {
       <CreateStack.Screen name="CreateForm" component={CreateScreen} />
       <CreateStack.Screen name="MapPicker" component={MapPickerScreen} />
     </CreateStack.Navigator>
-  );
-}
-
-// Temporary Map screen placeholder
-function MapScreen() {
-  return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Ionicons name="map" size={48} color={colors.gray500} />
-    </View>
   );
 }
 
