@@ -1,13 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, Pressable, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDummyDb } from '../contexts/DummyDbContext';
 import { colors } from '../constants/colors';
 import { Complaint, Project } from '../types/dummyDb';
-import { TabParamList } from '../navigation/AuthenticatedTabs';
+import { MapStackParamList } from '../navigation/AuthenticatedTabs';
 import { Dimensions } from 'react-native';
 const { width } = Dimensions.get('window');
 
@@ -32,7 +32,7 @@ export default function MapScreen() {
   const [mode, setMode] = useState<MapMode>('complaints');
   const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
   const { complaints, projects } = useDummyDb();
-  const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   const mapRef = useRef<MapView>(null);
 
   const handleMarkerPress = (item: SelectedItem) => {
@@ -45,19 +45,17 @@ export default function MapScreen() {
     setSelectedItem(null);
 
     if (selectedItem.type === 'complaint') {
-      navigation.navigate('Complaints', {
-        screen: 'ComplaintDetail',
-        params: { complaintId: selectedItem.data.id },
-      } as any);
+      navigation.navigate('ComplaintDetail', {
+        complaintId: selectedItem.data.id,
+      });
     } else {
-      navigation.navigate('Transparency', {
-        screen: 'ProjectDetail',
-        params: { projectId: selectedItem.data.id },
-      } as any);
+      navigation.navigate('ProjectDetail', {
+        projectId: selectedItem.data.id,
+      });
     }
   };
 
-  const renderMarkers = () => {
+  const renderMarkers = useMemo(() => {
     if (mode === 'complaints') {
       return complaints.map((complaint) => (
         <Marker
@@ -93,7 +91,7 @@ export default function MapScreen() {
           />
         ));
     }
-  };
+  }, [mode, complaints, projects, selectedItem]);
 
   return (
     <View className="flex-1">
@@ -109,7 +107,7 @@ export default function MapScreen() {
           );
         }}
       >
-        {renderMarkers()}
+        {renderMarkers}
       </MapView>
 
       {/* Mode Toggle Button */}
@@ -189,14 +187,6 @@ export default function MapScreen() {
                 style={{ color: colors.gray900 }}
               >
                 {selectedItem.data.title}
-              </Text>
-
-              {/* Description */}
-              <Text
-                className="text-base mb-4"
-                style={{ color: colors.gray700 }}
-              >
-                {selectedItem.data.description}
               </Text>
 
               {/* Images */}

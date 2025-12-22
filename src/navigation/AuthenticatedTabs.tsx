@@ -48,6 +48,12 @@ export type CreateStackParamList = {
   };
 };
 
+export type MapStackParamList = {
+  MapView: undefined;
+  ComplaintDetail: { complaintId: string };
+  ProjectDetail: { projectId: string };
+};
+
 export type TabParamList = {
   Complaints: undefined;
   Transparency: undefined;
@@ -60,6 +66,7 @@ const Tab = createBottomTabNavigator<TabParamList>();
 const ComplaintsStack = createNativeStackNavigator<ComplaintsStackParamList>();
 const TransparencyStack = createNativeStackNavigator<TransparencyStackParamList>();
 const CreateStack = createNativeStackNavigator<CreateStackParamList>();
+const MapStack = createNativeStackNavigator<MapStackParamList>();
 
 function ComplaintsNavigator() {
   return (
@@ -89,6 +96,16 @@ function CreateNavigator() {
         <CreateStack.Screen name="MapPicker" component={MapPickerScreen} />
       </CreateStack.Navigator>
     </FormDraftProvider>
+  );
+}
+
+function MapNavigator() {
+  return (
+    <MapStack.Navigator screenOptions={{ headerShown: false }}>
+      <MapStack.Screen name="MapView" component={MapScreen} />
+      <MapStack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
+      <MapStack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
+    </MapStack.Navigator>
   );
 }
 
@@ -142,7 +159,7 @@ export default function AuthenticatedTabs() {
       />
       <Tab.Screen
         name="Map"
-        component={MapScreen}
+        component={MapNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map" size={size} color={color} />
