@@ -8,6 +8,8 @@ import { useDummyDb } from '../contexts/DummyDbContext';
 import { colors } from '../constants/colors';
 import { Complaint, Project } from '../types/dummyDb';
 import { TabParamList } from '../navigation/AuthenticatedTabs';
+import { Dimensions } from 'react-native';
+const { width } = Dimensions.get('window');
 
 type MapMode = 'complaints' | 'transparency';
 
@@ -128,7 +130,7 @@ export default function MapScreen() {
           <TouchableOpacity
             className="flex-1 py-3 px-4 flex-row items-center justify-center"
             style={{
-              backgroundColor: mode === 'transparency' ? colors.secondary : colors.white,
+              backgroundColor: mode === 'transparency' ? colors.primary : colors.white,
             }}
             onPress={() => setMode('transparency')}
           >
@@ -160,7 +162,7 @@ export default function MapScreen() {
 
           {/* Panel */}
           <View
-            className="absolute bottom-0 left-0 right-0 rounded-t-3xl p-6"
+            className="absolute bottom-0 left-0 right-0 rounded-t-3xl p-6 pb-8"
             style={{
               backgroundColor: colors.white,
               shadowColor: colors.black,
@@ -189,27 +191,22 @@ export default function MapScreen() {
 
               {/* Images */}
               {selectedItem.data.images && selectedItem.data.images.length > 0 && (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
+                <View
                   className="mb-4"
                 >
-                  {selectedItem.data.images.map((image, index) => (
-                    <Image
-                      key={index}
-                      source={{ uri: image.uri }}
-                      className="w-32 h-32 rounded-lg mr-2"
-                      resizeMode="cover"
-                    />
-                  ))}
-                </ScrollView>
+                  <Image
+                    source={{ uri: selectedItem.data.images[0].uri }}
+                    style={{ width: width - 48, height: 200, borderRadius: 12, marginRight: 8 }}
+                    resizeMode="cover"
+                  />
+                </View>
               )}
 
               {/* View Details Button */}
               <TouchableOpacity
                 className="py-3 px-6 rounded-lg items-center"
                 style={{
-                  backgroundColor: selectedItem.type === 'complaint' ? colors.primary : colors.secondary
+                  backgroundColor: colors.primary,
                 }}
                 onPress={handleNavigateToDetail}
               >

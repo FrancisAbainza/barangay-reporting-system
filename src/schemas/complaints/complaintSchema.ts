@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { ComplaintCategory } from '../../types/dummyDb';
 
 export const complaintSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(100, 'Title must not exceed 100 characters'),

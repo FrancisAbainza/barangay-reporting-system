@@ -4,7 +4,6 @@ import {
   getCurrentPositionAsync,
   useForegroundPermissions,
   PermissionStatus,
-  reverseGeocodeAsync,
 } from 'expo-location';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -52,9 +51,9 @@ export function LocationPicker({
       if (isFocused && route.params?.pickedLatitude && route.params?.pickedLongitude) {
         const latitude = route.params.pickedLatitude;
         const longitude = route.params.pickedLongitude;
-        
+
         const address = await fetchAddress(latitude, longitude);
-        
+
         setPickedLocation({
           latitude,
           longitude,
@@ -89,7 +88,8 @@ export function LocationPicker({
         'Permission Required',
         'You need to grant location permissions to use this feature.'
       );
-      return false;
+      const permissionResponse = await requestPermission();
+      return permissionResponse.granted;
     }
 
     return true;
@@ -127,8 +127,15 @@ export function LocationPicker({
     }
   }
 
-  function pickOnMapHandler() {
+  async function pickOnMapHandler() {
     if (disabled) return;
+
+    const hasPermission = await verifyPermissions();
+
+    if (!hasPermission) {
+      return;
+    }
+
     navigation.navigate('MapPicker', {
       initialLatitude: pickedLocation?.latitude,
       initialLongitude: pickedLocation?.longitude,

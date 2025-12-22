@@ -13,6 +13,7 @@ import AccountScreen from '../screens/AccountScreen';
 import MapScreen from '../screens/MapScreen';
 import { colors } from '../constants/colors';
 import { View } from 'react-native';
+import { FormDraftProvider } from '../contexts/FormDraftContext';
 
 export type ComplaintsStackParamList = {
   ComplaintsList: undefined;
@@ -82,10 +83,12 @@ function TransparencyNavigator() {
 
 function CreateNavigator() {
   return (
-    <CreateStack.Navigator screenOptions={{ headerShown: false }}>
-      <CreateStack.Screen name="CreateForm" component={CreateScreen} />
-      <CreateStack.Screen name="MapPicker" component={MapPickerScreen} />
-    </CreateStack.Navigator>
+    <FormDraftProvider>
+      <CreateStack.Navigator screenOptions={{ headerShown: false }}>
+        <CreateStack.Screen name="CreateForm" component={CreateScreen} />
+        <CreateStack.Screen name="MapPicker" component={MapPickerScreen} />
+      </CreateStack.Navigator>
+    </FormDraftProvider>
   );
 }
 
@@ -97,8 +100,8 @@ export default function AuthenticatedTabs() {
         tabBarInactiveTintColor: colors.gray500,
       }}
     >
-      <Tab.Screen 
-        name="Complaints" 
+      <Tab.Screen
+        name="Complaints"
         component={ComplaintsNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -106,8 +109,8 @@ export default function AuthenticatedTabs() {
           ),
         }}
       />
-      <Tab.Screen 
-        name="Transparency" 
+      <Tab.Screen
+        name="Transparency"
         component={TransparencyNavigator}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -115,8 +118,8 @@ export default function AuthenticatedTabs() {
           ),
         }}
       />
-      <Tab.Screen 
-        name="Create" 
+      <Tab.Screen
+        name="Create"
         component={CreateNavigator}
         options={{
           tabBarIcon: ({ focused }) => (
@@ -128,17 +131,17 @@ export default function AuthenticatedTabs() {
                 backgroundColor: colors.primary,
               }}
             >
-              <Ionicons 
-                name={focused ? "add-circle" : "add-circle-outline"} 
-                size={32} 
-                color={colors.white} 
+              <Ionicons
+                name={focused ? "add-circle" : "add-circle-outline"}
+                size={32}
+                color={colors.white}
               />
             </View>
           ),
         }}
       />
-      <Tab.Screen 
-        name="Map" 
+      <Tab.Screen
+        name="Map"
         component={MapScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
@@ -146,8 +149,8 @@ export default function AuthenticatedTabs() {
           ),
         }}
       />
-      <Tab.Screen 
-        name="Account" 
+      <Tab.Screen
+        name="Account"
         component={AccountScreen}
         options={{
           tabBarIcon: ({ color, size }) => (

@@ -17,7 +17,10 @@ export default function TransparencyScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer scrollable={false} keyboardAvoiding={false}>
-      <ScreenHeader title="Transparency" />
+      <ScreenHeader
+        subtitle='List of government projects and initiatives across the barangay for transparency.'
+        bordered
+      />
       <View className="flex-1">
         <ProjectList projects={projects} onProjectPress={handleProjectPress} />
       </View>

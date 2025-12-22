@@ -4,26 +4,15 @@ import { ScreenContainer, ScreenHeader } from '../components/ui';
 import { ComplaintForm } from '../components/complaints';
 import { ComplaintFormData } from '../schemas/complaints';
 import { useDummyDb } from '../contexts/DummyDbContext';
-import { useAuth } from '../contexts/AuthContext';
 
 export default function CreateScreen() {
   const [loading, setLoading] = useState(false);
   const { createComplaint } = useDummyDb();
-  const { user } = useAuth();
 
   const handleSubmit = async (data: ComplaintFormData) => {
     setLoading(true);
     try {
-      const newComplaint = createComplaint({
-        title: data.title,
-        description: data.description,
-        category: data.category,
-        location: {
-          latitude: data.location.latitude,
-          longitude: data.location.longitude,
-        },
-        images: data.images,
-      });
+      const newComplaint = createComplaint(data);
 
       Alert.alert(
         'Success',
@@ -47,7 +36,7 @@ export default function CreateScreen() {
   return (
     <ScreenContainer>
       <ScreenHeader title="Report a Complaint" />
-      <ComplaintForm onSubmit={handleSubmit} loading={loading} />
+        <ComplaintForm onSubmit={handleSubmit} loading={loading} />
     </ScreenContainer>
   );
 }

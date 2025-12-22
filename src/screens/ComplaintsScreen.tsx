@@ -11,7 +11,6 @@ import { Complaint } from '../types/dummyDb';
 type Props = NativeStackScreenProps<ComplaintsStackParamList, 'ComplaintsList'>;
 
 export default function ComplaintsScreen({ navigation }: Props) {
-  const { user } = useAuth();
   const { complaints } = useDummyDb();
 
   const handleComplaintPress = (complaint: Complaint) => {
@@ -21,8 +20,7 @@ export default function ComplaintsScreen({ navigation }: Props) {
   return (
     <View className="flex-1 bg-white">
       <ScreenHeader 
-        title="Complaints" 
-        subtitle={user ? `Welcome, ${user.name}` : undefined}
+        subtitle="List of user-reported complaints across the barangay."
         bordered
       />
       

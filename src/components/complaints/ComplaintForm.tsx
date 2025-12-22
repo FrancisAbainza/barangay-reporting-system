@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,6 +9,7 @@ import { LocationPicker } from '../ui/LocationPicker';
 import { ImagePickerComponent } from '../ui/ImagePicker';
 import { colors } from '../../constants/colors';
 import { ComplaintCategory } from '../../types/dummyDb';
+import { useFormDraft } from '../../contexts/FormDraftContext';
 
 interface ComplaintFormProps {
   onSubmit: (data: ComplaintFormData) => Promise<void>;
@@ -35,22 +36,35 @@ export function ComplaintForm({
   mode = 'create',
   loading = false,
 }: ComplaintFormProps) {
+  const { draft, setDraft, clearDraft } = useFormDraft();
+
   const {
     control,
     handleSubmit,
-    setValue,
     watch,
+    reset,
     formState: { errors },
   } = useForm<ComplaintFormData>({
     resolver: zodResolver(complaintSchema),
     defaultValues: {
-      title: initialData?.title || '',
-      description: initialData?.description || '',
-      category: initialData?.category || undefined,
-      location: initialData?.location || undefined,
-      images: initialData?.images || [],
+      title: '',
+      description: '',
+      category: undefined,
+      location: undefined,
+      images: [],
+      ...initialData,
+      ...draft,
     },
   });
+
+
+  useEffect(() => {
+    const sub = watch((value) => {
+      setDraft(value as Partial<ComplaintFormData>);
+    });
+
+    return () => sub.unsubscribe();
+  }, [watch]);
 
   const selectedCategory = watch('category');
   const currentLocation = watch('location');
@@ -59,14 +73,26 @@ export function ComplaintForm({
   const handleFormSubmit = async (data: ComplaintFormData) => {
     try {
       await onSubmit(data);
+
+      // Clear RHF form
+      reset({
+        title: '',
+        description: '',
+        category: undefined,
+        location: undefined,
+        images: [],
+      });
+
+      // Clear draft context
+      clearDraft();
     } catch (error) {
       Alert.alert('Error', 'Failed to submit complaint. Please try again.');
     }
   };
 
   return (
-    <ScrollView 
-      className="flex-1 bg-white"
+    <ScrollView
+      className="flex-1 bg-white pb-4"
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
