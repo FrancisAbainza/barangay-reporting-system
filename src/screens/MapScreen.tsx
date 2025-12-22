@@ -61,12 +61,17 @@ export default function MapScreen() {
     if (mode === 'complaints') {
       return complaints.map((complaint) => (
         <Marker
-          key={complaint.id}
+          key={`${complaint.id}-${selectedItem?.data.id || ''}`}
           coordinate={{
             latitude: complaint.location.latitude,
             longitude: complaint.location.longitude,
           }}
           onPress={() => handleMarkerPress({ type: 'complaint', data: complaint })}
+          pinColor={
+            selectedItem?.type === 'complaint' && selectedItem.data.id === complaint.id
+              ? colors.primary
+              : 'red'
+          }
         />
       ));
     } else {
@@ -74,12 +79,17 @@ export default function MapScreen() {
         .filter((project) => project.location)
         .map((project) => (
           <Marker
-            key={project.id}
+            key={`${project.id}-${selectedItem?.data.id || ''}`}
             coordinate={{
               latitude: project.location!.latitude,
               longitude: project.location!.longitude,
             }}
             onPress={() => handleMarkerPress({ type: 'project', data: project })}
+            pinColor={
+              selectedItem?.type === 'project' && selectedItem.data.id === project.id
+                ? colors.primary
+                : 'red'
+            }
           />
         ));
     }

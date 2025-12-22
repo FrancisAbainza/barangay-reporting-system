@@ -36,7 +36,7 @@ export default function CreateScreen() {
   return (
     <ScreenContainer>
       <ScreenHeader title="Report a Complaint" />
-        <ComplaintForm onSubmit={handleSubmit} loading={loading} />
+      <ComplaintForm onSubmit={handleSubmit} loading={loading} />
     </ScreenContainer>
   );
 }
