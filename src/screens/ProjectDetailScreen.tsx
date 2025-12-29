@@ -5,7 +5,8 @@ import { Button, IconButton } from '../components/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { TransparencyStackParamList } from '../navigation/AuthenticatedTabs';
 import { colors } from '../constants/colors';
-import { useDummyDb } from '../contexts/DummyDbContext';
+import { useProjectDb } from '../contexts/ProjectDbContext';
+import { Comment } from '../types/shared';
 import { getMapPreview, fetchAddress } from '../utils/mapUtils';
 
 type Props = NativeStackScreenProps<TransparencyStackParamList, 'ProjectDetail'>;
@@ -91,10 +92,12 @@ const formatDate = (date: Date) => {
 
 export default function ProjectDetailScreen({ route, navigation }: Props) {
   const { projectId } = route.params;
-  const { getProject } = useDummyDb();
-  const project = getProject(projectId);
+  const { projects } = useProjectDb();
+  const project = projects.find(p => p.id === projectId);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [commentText, setCommentText] = useState('');
+  const [replyText, setReplyText] = useState('');
+  const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
   const [address, setAddress] = useState<string>('');
   const screenWidth = Dimensions.get('window').width;
 
@@ -125,6 +128,15 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
       // TODO: Implement comment submission
       console.log('Submitting comment:', commentText);
       setCommentText('');
+    }
+  };
+
+  const handleSubmitReply = (commentId: string) => {
+    if (replyText.trim()) {
+      // TODO: Implement reply submission
+      console.log('Submitting reply to comment:', commentId, replyText);
+      setReplyText('');
+      setReplyingToCommentId(null);
     }
   };
 
@@ -332,16 +344,58 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
                   {formatDate(project.startDate)}
                 </Text>
               </View>
-              {project.endDate && (
-                <View className="flex-row items-center">
+              {project.expectedCompletionDate && (
+                <View className="flex-row items-center mb-2">
                   <Text className="text-sm font-medium mr-2" style={{ color: colors.gray600 }}>
-                    End Date:
+                    Expected Completion:
                   </Text>
                   <Text className="text-base" style={{ color: colors.gray900 }}>
-                    {formatDate(project.endDate)}
+                    {formatDate(project.expectedCompletionDate)}
                   </Text>
                 </View>
               )}
+              {project.actualCompletionDate && (
+                <View className="flex-row items-center">
+                  <Text className="text-sm font-medium mr-2" style={{ color: colors.gray600 }}>
+                    Actual Completion:
+                  </Text>
+                  <Text className="text-base" style={{ color: colors.success }}>
+                    {formatDate(project.actualCompletionDate)}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Progress Percentage */}
+          <View
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
+          >
+            <View className="flex-row items-center mb-3">
+              <Ionicons name="stats-chart" size={20} color={colors.primary} />
+              <Text className="ml-2 text-sm font-medium" style={{ color: colors.gray500 }}>
+                Progress
+              </Text>
+            </View>
+            <View className="ml-7">
+              <View className="flex-row items-center justify-between mb-2">
+                <Text className="text-2xl font-bold" style={{ color: colors.primary }}>
+                  {project.progressPercentage}%
+                </Text>
+                <Text className="text-sm" style={{ color: colors.gray600 }}>
+                  {project.progressPercentage === 100 ? 'Completed' : 'In Progress'}
+                </Text>
+              </View>
+              <View className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: colors.gray200 }}>
+                <View
+                  className="h-full rounded-full"
+                  style={{
+                    backgroundColor: project.progressPercentage === 100 ? colors.success : colors.primary,
+                    width: `${project.progressPercentage}%`,
+                  }}
+                />
+              </View>
             </View>
           </View>
 
@@ -386,6 +440,47 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
           )}
         </View>
 
+        {/* Progress Updates */}
+        {project.progressUpdates && project.progressUpdates.length > 0 && (
+          <View className="px-4 mt-6">
+            <Text className="text-lg font-semibold mb-3" style={{ color: colors.gray900 }}>
+              Progress Updates ({project.progressUpdates.length})
+            </Text>
+            <View className="gap-3">
+              {project.progressUpdates.map((update, index) => (
+                <View
+                  key={index}
+                  className="p-4 rounded-lg"
+                  style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
+                >
+                  <View className="flex-row items-center mb-2">
+                    <Ionicons name="information-circle" size={20} color={colors.info} />
+                    <Text className="ml-2 text-xs" style={{ color: colors.gray500 }}>
+                      {new Date(update.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </Text>
+                  </View>
+                  <Text className="text-base mb-3" style={{ color: colors.gray700 }}>
+                    {update.description}
+                  </Text>
+                  {update.image && (
+                    <Image
+                      source={{ uri: update.image.uri }}
+                      style={{ width: '100%', height: 200, borderRadius: 8 }}
+                      resizeMode="cover"
+                    />
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* Comment Input */}
         <View className="px-4 mt-6">
           <Text className="text-base font-semibold mb-2" style={{ color: colors.gray900 }}>
@@ -421,7 +516,7 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
               Comments ({project.comments.length})
             </Text>
             <View className="gap-3">
-              {project.comments.map((comment) => (
+              {project.comments.map((comment: Comment) => (
                 <View
                   key={comment.id}
                   className="p-4 rounded-lg"
@@ -460,21 +555,130 @@ export default function ProjectDetailScreen({ route, navigation }: Props) {
                     {comment.content}
                   </Text>
 
-                  {/* Comment Voting */}
-                  <View className="flex-row items-center gap-4">
-                    <Pressable className="flex-row items-center active:opacity-70">
-                      <Ionicons name="thumbs-up-outline" size={18} color={colors.success} />
-                      <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
-                        {comment.likes?.length || 0}
-                      </Text>
-                    </Pressable>
-                    <Pressable className="flex-row items-center active:opacity-70">
-                      <Ionicons name="thumbs-down-outline" size={18} color={colors.error} />
-                      <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
-                        {comment.dislikes?.length || 0}
+                  {/* Comment Voting and Reply */}
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center gap-4">
+                      <Pressable className="flex-row items-center active:opacity-70">
+                        <Ionicons name="thumbs-up-outline" size={18} color={colors.success} />
+                        <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
+                          {comment.likes?.length || 0}
+                        </Text>
+                      </Pressable>
+                      <Pressable className="flex-row items-center active:opacity-70">
+                        <Ionicons name="thumbs-down-outline" size={18} color={colors.error} />
+                        <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
+                          {comment.dislikes?.length || 0}
+                        </Text>
+                      </Pressable>
+                    </View>
+                    <Pressable
+                      className="flex-row items-center active:opacity-70"
+                      onPress={() => setReplyingToCommentId(comment.id)}
+                    >
+                      <Ionicons name="return-down-forward" size={18} color={colors.primary} />
+                      <Text className="text-sm ml-1 font-medium" style={{ color: colors.primary }}>
+                        Reply
                       </Text>
                     </Pressable>
                   </View>
+
+                  {/* Replies */}
+                  {comment.replies && comment.replies.length > 0 && (
+                    <View className="mt-3 ml-4 pl-3 border-l-2" style={{ borderLeftColor: colors.gray300 }}>
+                      {comment.replies.map((reply) => (
+                        <View key={reply.id} className="mb-3">
+                          <View className="flex-row items-center mb-1">
+                            <View
+                              className="w-6 h-6 rounded-full items-center justify-center"
+                              style={{ backgroundColor: reply.isAdmin ? colors.primary : colors.gray400 }}
+                            >
+                              <Text className="text-xs font-semibold" style={{ color: colors.white }}>
+                                {reply.userName.charAt(0).toUpperCase()}
+                              </Text>
+                            </View>
+                            <Text className="text-sm font-semibold ml-2" style={{ color: colors.gray900 }}>
+                              {reply.userName}
+                              {reply.isAdmin && (
+                                <Text className="text-xs font-normal" style={{ color: colors.primary }}>
+                                  {' '}(Admin)
+                                </Text>
+                              )}
+                            </Text>
+                          </View>
+                          <Text className="text-sm ml-8 mb-2" style={{ color: colors.gray700 }}>
+                            {reply.content}
+                          </Text>
+                          <View className="flex-row items-center ml-8 gap-4">
+                            <Text className="text-xs" style={{ color: colors.gray400 }}>
+                              {new Date(reply.createdAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </Text>
+                            <View className="flex-row items-center gap-3">
+                              <View className="flex-row items-center">
+                                <Ionicons name="thumbs-up-outline" size={14} color={colors.success} />
+                                <Text className="text-xs ml-1" style={{ color: colors.gray500 }}>
+                                  {reply.likes?.length || 0}
+                                </Text>
+                              </View>
+                              <View className="flex-row items-center">
+                                <Ionicons name="thumbs-down-outline" size={14} color={colors.error} />
+                                <Text className="text-xs ml-1" style={{ color: colors.gray500 }}>
+                                  {reply.dislikes?.length || 0}
+                                </Text>
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+
+                  {/* Reply Input */}
+                  {replyingToCommentId === comment.id && (
+                    <View
+                      className="mt-3 p-3 rounded-lg"
+                      style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.gray300 }}
+                    >
+                      <TextInput
+                        placeholder="Write your reply..."
+                        placeholderTextColor={colors.gray400}
+                        value={replyText}
+                        onChangeText={setReplyText}
+                        multiline
+                        numberOfLines={3}
+                        textAlignVertical="top"
+                        className="text-sm mb-2"
+                        style={{ color: colors.gray900, minHeight: 60 }}
+                      />
+                      <View className="flex-row gap-2">
+                        <Pressable
+                          className="flex-1 py-2 rounded-lg items-center active:opacity-70"
+                          style={{ backgroundColor: colors.primary }}
+                          onPress={() => handleSubmitReply(comment.id)}
+                        >
+                          <Text className="text-sm font-semibold" style={{ color: colors.white }}>
+                            Submit Reply
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          className="flex-1 py-2 rounded-lg items-center active:opacity-70"
+                          style={{ backgroundColor: colors.gray200 }}
+                          onPress={() => {
+                            setReplyingToCommentId(null);
+                            setReplyText('');
+                          }}
+                        >
+                          <Text className="text-sm font-semibold" style={{ color: colors.gray700 }}>
+                            Cancel
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  )}
                 </View>
               ))}
             </View>

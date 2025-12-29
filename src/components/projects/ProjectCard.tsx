@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Project } from '../../types/dummyDb';
+import { Project } from '../../types/project';
 import { colors } from '../../constants/colors';
 
 interface ProjectCardProps {

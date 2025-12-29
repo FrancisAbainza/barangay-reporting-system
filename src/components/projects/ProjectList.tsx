@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, View, Text } from 'react-native';
-import { Project } from '../../types/dummyDb';
+import { Project } from '../../types/project';
 import { ProjectCard } from './ProjectCard';
 import { colors } from '../../constants/colors';
 

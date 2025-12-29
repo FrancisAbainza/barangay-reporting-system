@@ -3,13 +3,13 @@ import { View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { TransparencyStackParamList } from '../navigation/AuthenticatedTabs';
 import { ScreenContainer, ScreenHeader, ProjectList } from '../components';
-import { useDummyDb } from '../contexts/DummyDbContext';
-import { Project } from '../types/dummyDb';
+import { useProjectDb } from '../contexts/ProjectDbContext';
+import { Project } from '../types/project';
 
 type Props = NativeStackScreenProps<TransparencyStackParamList, 'ProjectsList'>;
 
 export default function TransparencyScreen({ navigation }: Props) {
-  const { projects } = useDummyDb();
+  const { projects } = useProjectDb();
 
   const handleProjectPress = (project: Project) => {
     navigation.navigate('ProjectDetail', { projectId: project.id });
