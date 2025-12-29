@@ -62,10 +62,10 @@ export default function TransparencyScreen({ navigation }: Props) {
 
   return (
     <ScreenContainer scrollable={false} keyboardAvoiding={false}>
-      <ScreenHeader
+      {/* <ScreenHeader
         subtitle='List of government projects and initiatives across the barangay for transparency.'
         bordered
-      />
+      /> */}
       
       <ProjectFilter
         filters={filters}

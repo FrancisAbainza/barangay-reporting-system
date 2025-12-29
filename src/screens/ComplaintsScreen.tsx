@@ -78,10 +78,10 @@ export default function ComplaintsScreen({ navigation }: Props) {
 
   return (
     <View className="flex-1 bg-white">
-      <ScreenHeader 
+      {/* <ScreenHeader 
         subtitle="List of user-reported complaints across the barangay."
         bordered
-      />
+      /> */}
       
       <ComplaintFilter
         filters={filters}

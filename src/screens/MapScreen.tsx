@@ -6,10 +6,12 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useComplaintDb } from '../contexts/ComplaintDbContext';
 import { useProjectDb } from '../contexts/ProjectDbContext';
+import { useAuth } from '../contexts/AuthContext';
 import { colors } from '../constants/colors';
 import { Complaint } from '../types/complaint';
 import { Project } from '../types/project';
 import { MapStackParamList } from '../navigation/AuthenticatedTabs';
+import { MapFilter, MapComplaintFilters, MapProjectFilters } from '../components/map';
 import { Dimensions } from 'react-native';
 const { width } = Dimensions.get('window');
 
@@ -35,8 +37,107 @@ export default function MapScreen() {
   const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
   const { complaints } = useComplaintDb();
   const { projects } = useProjectDb();
+  const { user } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   const mapRef = useRef<MapView>(null);
+
+  const [complaintFilters, setComplaintFilters] = useState<MapComplaintFilters>({
+    status: [],
+    category: [],
+    priority: [],
+    dateRange: undefined,
+    myComplaints: false,
+  });
+
+  const [projectFilters, setProjectFilters] = useState<MapProjectFilters>({
+    status: [],
+    category: [],
+    dateRange: undefined,
+  });
+
+  const filteredComplaints = useMemo(() => {
+    return complaints.filter((complaint) => {
+      if (!complaint.location) return false;
+
+      if (complaintFilters.myComplaints && user && complaint.complainantId !== user.id) {
+        return false;
+      }
+
+      if (complaintFilters.status.length > 0 && !complaintFilters.status.includes(complaint.status)) {
+        return false;
+      }
+
+      if (complaintFilters.category.length > 0 && !complaintFilters.category.includes(complaint.category)) {
+        return false;
+      }
+
+      if (complaintFilters.priority.length > 0 && !complaintFilters.priority.includes(complaint.priority)) {
+        return false;
+      }
+
+      if (complaintFilters.dateRange?.start && complaintFilters.dateRange?.end) {
+        const complaintDate = new Date(complaint.createdAt);
+        const startDate = new Date(complaintFilters.dateRange.start);
+        const endDate = new Date(complaintFilters.dateRange.end);
+        
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        
+        if (complaintDate < startDate || complaintDate > endDate) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [complaints, complaintFilters, user]);
+
+  const filteredProjects = useMemo(() => {
+    return projects.filter((project) => {
+      if (!project.location) return false;
+
+      if (projectFilters.status.length > 0 && !projectFilters.status.includes(project.status)) {
+        return false;
+      }
+
+      if (projectFilters.category.length > 0 && !projectFilters.category.includes(project.category)) {
+        return false;
+      }
+
+      if (projectFilters.dateRange?.start && projectFilters.dateRange?.end) {
+        const projectDate = new Date(project.startDate);
+        const startDate = new Date(projectFilters.dateRange.start);
+        const endDate = new Date(projectFilters.dateRange.end);
+        
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        
+        if (projectDate < startDate || projectDate > endDate) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [projects, projectFilters]);
+
+  const activeFilterCount = useMemo(() => {
+    if (mode === 'complaints') {
+      return (
+        complaintFilters.status.length +
+        complaintFilters.category.length +
+        complaintFilters.priority.length +
+        (complaintFilters.dateRange?.start && complaintFilters.dateRange?.end ? 1 : 0) +
+        (complaintFilters.myComplaints ? 1 : 0)
+      );
+    } else {
+      return (
+        projectFilters.status.length +
+        projectFilters.category.length +
+        (projectFilters.dateRange?.start && projectFilters.dateRange?.end ? 1 : 0)
+      );
+    }
+  }, [mode, complaintFilters, projectFilters]);
 
   const handleMarkerPress = (item: SelectedItem) => {
     setSelectedItem(item);
@@ -60,43 +161,90 @@ export default function MapScreen() {
 
   const renderMarkers = useMemo(() => {
     if (mode === 'complaints') {
-      return complaints
-        .filter((complaint) => complaint.location)
-        .map((complaint) => (
-          <Marker
-            key={`${complaint.id}-${selectedItem?.data.id || ''}`}
-            coordinate={{
-              latitude: complaint.location!.latitude,
-              longitude: complaint.location!.longitude,
-            }}
-            onPress={() => handleMarkerPress({ type: 'complaint', data: complaint })}
-            pinColor={
-              selectedItem?.type === 'complaint' && selectedItem.data.id === complaint.id
-                ? colors.primary
-                : 'red'
-            }
-          />
-        ));
+      return filteredComplaints.map((complaint) => (
+        <Marker
+          key={`${complaint.id}-${selectedItem?.data.id || ''}`}
+          coordinate={{
+            latitude: complaint.location!.latitude,
+            longitude: complaint.location!.longitude,
+          }}
+          onPress={() => handleMarkerPress({ type: 'complaint', data: complaint })}
+          pinColor={
+            selectedItem?.type === 'complaint' && selectedItem.data.id === complaint.id
+              ? colors.primary
+              : 'red'
+          }
+        />
+      ));
     } else {
-      return projects
-        .filter((project) => project.location)
-        .map((project) => (
-          <Marker
-            key={`${project.id}-${selectedItem?.data.id || ''}`}
-            coordinate={{
-              latitude: project.location!.latitude,
-              longitude: project.location!.longitude,
-            }}
-            onPress={() => handleMarkerPress({ type: 'project', data: project })}
-            pinColor={
-              selectedItem?.type === 'project' && selectedItem.data.id === project.id
-                ? colors.primary
-                : 'red'
-            }
-          />
-        ));
+      return filteredProjects.map((project) => (
+        <Marker
+          key={`${project.id}-${selectedItem?.data.id || ''}`}
+          coordinate={{
+            latitude: project.location!.latitude,
+            longitude: project.location!.longitude,
+          }}
+          onPress={() => handleMarkerPress({ type: 'project', data: project })}
+          pinColor={
+            selectedItem?.type === 'project' && selectedItem.data.id === project.id
+              ? colors.primary
+              : 'red'
+          }
+        />
+      ));
     }
-  }, [mode, complaints, projects, selectedItem]);
+  }, [mode, filteredComplaints, filteredProjects, selectedItem]);
+
+  const renderBottomPanel = () => {
+    if (!selectedItem) return null;
+
+    return (
+      <>
+        <Pressable
+          className="absolute inset-0"
+          onPress={() => setSelectedItem(null)}
+        />
+        <View
+          className="absolute bottom-0 left-0 right-0 rounded-t-3xl p-6 pb-8"
+          style={{
+            backgroundColor: colors.white,
+            shadowColor: colors.black,
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 5,
+          }}
+        >
+          <ScrollView className="max-h-96">
+            <Text
+              className="text-2xl font-bold mb-2"
+              style={{ color: colors.gray900 }}
+            >
+              {selectedItem.data.title}
+            </Text>
+            {selectedItem.data.images && selectedItem.data.images.length > 0 && (
+              <View className="mb-4">
+                <Image
+                  source={{ uri: selectedItem.data.images[0].uri }}
+                  style={{ width: width - 48, height: 200, borderRadius: 12, marginRight: 8 }}
+                  resizeMode="cover"
+                />
+              </View>
+            )}
+            <TouchableOpacity
+              className="py-3 px-6 rounded-lg items-center"
+              style={{ backgroundColor: colors.primary }}
+              onPress={handleNavigateToDetail}
+            >
+              <Text className="font-semibold text-base" style={{ color: colors.white }}>
+                View Full Details
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </>
+    );
+  };
 
   return (
     <View className="flex-1">
@@ -106,10 +254,7 @@ export default function MapScreen() {
         style={StyleSheet.absoluteFillObject}
         initialRegion={DEFAULT_REGION}
         onMapReady={() => {
-          mapRef.current?.animateToRegion(
-            DEFAULT_REGION,
-            0
-          );
+          mapRef.current?.animateToRegion(DEFAULT_REGION, 0);
         }}
       >
         {renderMarkers}
@@ -164,68 +309,20 @@ export default function MapScreen() {
         </View>
       </View>
 
-      {/* Bottom Sliding Panel */}
-      {selectedItem && (
-        <>
-          {/* Backdrop */}
-          <Pressable
-            className="absolute inset-0"
-            onPress={() => setSelectedItem(null)}
-          />
+      {/* Filter Button */}
+      <View className="absolute top-32 right-4">
+        <MapFilter
+          mode={mode}
+          complaintFilters={complaintFilters}
+          projectFilters={projectFilters}
+          onComplaintFiltersChange={setComplaintFilters}
+          onProjectFiltersChange={setProjectFilters}
+          activeFilterCount={activeFilterCount}
+        />
+      </View>
 
-          {/* Panel */}
-          <View
-            className="absolute bottom-0 left-0 right-0 rounded-t-3xl p-6 pb-8"
-            style={{
-              backgroundColor: colors.white,
-              shadowColor: colors.black,
-              shadowOffset: { width: 0, height: -2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 5,
-            }}
-          >
-            <ScrollView className="max-h-96">
-              {/* Title */}
-              <Text
-                className="text-2xl font-bold mb-2"
-                style={{ color: colors.gray900 }}
-              >
-                {selectedItem.data.title}
-              </Text>
 
-              {/* Images */}
-              {selectedItem.data.images && selectedItem.data.images.length > 0 && (
-                <View
-                  className="mb-4"
-                >
-                  <Image
-                    source={{ uri: selectedItem.data.images[0].uri }}
-                    style={{ width: width - 48, height: 200, borderRadius: 12, marginRight: 8 }}
-                    resizeMode="cover"
-                  />
-                </View>
-              )}
-
-              {/* View Details Button */}
-              <TouchableOpacity
-                className="py-3 px-6 rounded-lg items-center"
-                style={{
-                  backgroundColor: colors.primary,
-                }}
-                onPress={handleNavigateToDetail}
-              >
-                <Text
-                  className="font-semibold text-base"
-                  style={{ color: colors.white }}
-                >
-                  View Full Details
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </>
-      )}
+      {renderBottomPanel()}
     </View>
   );
 }
