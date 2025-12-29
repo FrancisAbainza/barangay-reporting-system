@@ -5,3 +5,4 @@ export { ScreenContainer } from './ScreenContainer';
 export { IconButton } from './IconButton';
 export { ImagePickerComponent } from './ImagePicker';
 export { LocationPicker } from './LocationPicker';
+export { DateRangePicker } from './DateRangePicker';

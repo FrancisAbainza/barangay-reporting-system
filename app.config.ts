@@ -37,6 +37,7 @@ const config: ExpoConfig = {
     favicon: './assets/favicon.png',
     bundler: 'metro',
   },
+  plugins: ['@react-native-community/datetimepicker'],
 };
 
 export default config;
