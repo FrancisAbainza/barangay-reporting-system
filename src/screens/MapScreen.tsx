@@ -4,7 +4,8 @@ import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useDummyDb } from '../contexts/DummyDbContext';
+import { useComplaintDb } from '../contexts/ComplaintDbContext';
+import { useProjectDb } from '../contexts/ProjectDbContext';
 import { colors } from '../constants/colors';
 import { Complaint } from '../types/complaint';
 import { Project } from '../types/project';
@@ -32,7 +33,8 @@ const DEFAULT_REGION = {
 export default function MapScreen() {
   const [mode, setMode] = useState<MapMode>('complaints');
   const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
-  const { complaints, projects } = useDummyDb();
+  const { complaints } = useComplaintDb();
+  const { projects } = useProjectDb();
   const navigation = useNavigation<NativeStackNavigationProp<MapStackParamList>>();
   const mapRef = useRef<MapView>(null);
 
@@ -58,21 +60,23 @@ export default function MapScreen() {
 
   const renderMarkers = useMemo(() => {
     if (mode === 'complaints') {
-      return complaints.map((complaint) => (
-        <Marker
-          key={`${complaint.id}-${selectedItem?.data.id || ''}`}
-          coordinate={{
-            latitude: complaint.location.latitude,
-            longitude: complaint.location.longitude,
-          }}
-          onPress={() => handleMarkerPress({ type: 'complaint', data: complaint })}
-          pinColor={
-            selectedItem?.type === 'complaint' && selectedItem.data.id === complaint.id
-              ? colors.primary
-              : 'red'
-          }
-        />
-      ));
+      return complaints
+        .filter((complaint) => complaint.location)
+        .map((complaint) => (
+          <Marker
+            key={`${complaint.id}-${selectedItem?.data.id || ''}`}
+            coordinate={{
+              latitude: complaint.location!.latitude,
+              longitude: complaint.location!.longitude,
+            }}
+            onPress={() => handleMarkerPress({ type: 'complaint', data: complaint })}
+            pinColor={
+              selectedItem?.type === 'complaint' && selectedItem.data.id === complaint.id
+                ? colors.primary
+                : 'red'
+            }
+          />
+        ));
     } else {
       return projects
         .filter((project) => project.location)
