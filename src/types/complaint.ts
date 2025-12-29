@@ -59,7 +59,7 @@ export interface Complaint {
   priority: "low" | "medium" | "high" | "urgent";
   complainantName: string;
   complainantId: string;
-  location?: ComplaintLocation;
+  location: ComplaintLocation;
   images?: Image[];
   resolutionDetails?: ResolutionDetail;
   resolvedAt?: Date;
@@ -76,8 +76,7 @@ export interface Complaint {
 export interface CreateComplaintInput {
   title: string;
   description: string;
-  category: ComplaintCategory;
-  location?: ComplaintLocation;
+  location: ComplaintLocation;
   images?: Image[];
 }
 

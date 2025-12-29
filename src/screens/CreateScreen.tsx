@@ -3,11 +3,11 @@ import { Alert } from 'react-native';
 import { ScreenContainer, ScreenHeader } from '../components/ui';
 import { ComplaintForm } from '../components/complaints';
 import { ComplaintFormData } from '../schemas/complaints';
-import { useDummyDb } from '../contexts/DummyDbContext';
+import { useComplaintDb } from '../contexts/ComplaintDbContext';
 
 export default function CreateScreen() {
   const [loading, setLoading] = useState(false);
-  const { createComplaint } = useDummyDb();
+  const { createComplaint } = useComplaintDb();
 
   const handleSubmit = async (data: ComplaintFormData) => {
     setLoading(true);

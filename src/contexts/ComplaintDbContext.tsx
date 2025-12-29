@@ -29,6 +29,7 @@ export type {
 // Context types
 interface ComplaintDbContextType {
   complaints: Complaint[];
+  createComplaint: (input: CreateComplaintInput) => Complaint;
   getComplaint: (id: string) => Complaint | undefined;
   deleteComplaint: (id: string) => boolean;
   updateComplaintStatus: (
@@ -541,6 +542,98 @@ export function ComplaintDbProvider({ children }: { children: ReactNode }) {
     return `${prefix}${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
   };
 
+  // AI-based function to determine category from complaint content
+  const determineCategory = (title: string, description: string): ComplaintCategory => {
+    const text = `${title} ${description}`.toLowerCase();
+
+    // Infrastructure keywords
+    if (/street|light|road|pothole|bridge|pavement|sidewalk|concrete|broken|damage|repair|fix/.test(text)) {
+      return 'infrastructure';
+    }
+    // Sanitation keywords
+    if (/garbage|trash|waste|dirty|clean|smell|odor|sanitation|toilet|bathroom|sewer/.test(text)) {
+      return 'sanitation';
+    }
+    // Public safety keywords
+    if (/safety|dangerous|hazard|crime|security|theft|robbery|assault|violence|weapon/.test(text)) {
+      return 'public_safety';
+    }
+    // Traffic keywords
+    if (/traffic|vehicle|parking|car|motorcycle|congestion|jam|road block/.test(text)) {
+      return 'traffic';
+    }
+    // Water/Electricity keywords
+    if (/water|electricity|electric|power|outage|supply|leak|pipe|wire|voltage/.test(text)) {
+      return 'water_electricity';
+    }
+    // Noise keywords
+    if (/noise|loud|sound|music|construction|disturbance|noisy/.test(text)) {
+      return 'noise';
+    }
+    // Domestic keywords
+    if (/domestic|family|household|neighbor|dispute|argument/.test(text)) {
+      return 'domestic';
+    }
+    // Environment keywords
+    if (/environment|pollution|tree|plant|flood|drainage|air quality|smoke/.test(text)) {
+      return 'environment';
+    }
+
+    return 'others';
+  };
+
+  // AI-based function to determine priority from complaint content
+  const determinePriority = (title: string, description: string, category: ComplaintCategory): "low" | "medium" | "high" | "urgent" => {
+    const text = `${title} ${description}`.toLowerCase();
+
+    // Urgent keywords
+    if (/urgent|emergency|immediate|danger|critical|serious|life threatening|injured|fire|flood|electrocution/.test(text)) {
+      return 'urgent';
+    }
+
+    // High priority keywords
+    if (/broken|damage|accident|unsafe|hazard|risk|concern|problem|blocked|overflow/.test(text)) {
+      return 'high';
+    }
+
+    // Public safety and water/electricity are typically high priority
+    if (category === 'public_safety' || category === 'water_electricity') {
+      return 'high';
+    }
+
+    // Medium priority keywords
+    if (/need|require|should|must|important|affect/.test(text)) {
+      return 'medium';
+    }
+
+    // Default to low
+    return 'low';
+  };
+
+  const createComplaint = (input: CreateComplaintInput): Complaint => {
+    // Determine category and priority using AI-based logic
+    const category = determineCategory(input.title, input.description);
+    const priority = determinePriority(input.title, input.description, category);
+
+    const newComplaint: Complaint = {
+      id: generateId('c'),
+      title: input.title,
+      description: input.description,
+      category,
+      status: 'submitted',
+      priority,
+      complainantName: 'Anonymous User', // Will be replaced with actual user data
+      complainantId: `user-${Math.floor(Math.random() * 1000)}`, // Will be replaced with actual user ID
+      location: input.location!,
+      images: input.images,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    setComplaints((prev) => [newComplaint, ...prev]);
+    return newComplaint;
+  };
+
   const deleteComplaint = (id: string): boolean => {
     const initialLength = complaints.length;
     setComplaints((prev) => prev.filter((complaint) => complaint.id !== id));
@@ -854,6 +947,7 @@ export function ComplaintDbProvider({ children }: { children: ReactNode }) {
 
   const value: ComplaintDbContextType = {
     complaints,
+    createComplaint,
     getComplaint,
     deleteComplaint,
     updateComplaintStatus,

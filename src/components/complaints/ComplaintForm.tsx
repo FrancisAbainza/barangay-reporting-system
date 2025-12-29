@@ -8,7 +8,6 @@ import { FormField, Button } from '../ui';
 import { LocationPicker } from '../ui/LocationPicker';
 import { ImagePickerComponent } from '../ui/ImagePicker';
 import { colors } from '../../constants/colors';
-import { ComplaintCategory } from '../../types/complaint';
 import { useFormDraft } from '../../contexts/FormDraftContext';
 
 interface ComplaintFormProps {
@@ -17,18 +16,6 @@ interface ComplaintFormProps {
   mode?: 'create' | 'edit';
   loading?: boolean;
 }
-
-const COMPLAINT_CATEGORIES: { value: ComplaintCategory; label: string }[] = [
-  { value: 'noise', label: 'Noise Complaint' },
-  { value: 'sanitation', label: 'Sanitation' },
-  { value: 'public_safety', label: 'Public Safety' },
-  { value: 'traffic', label: 'Traffic' },
-  { value: 'infrastructure', label: 'Infrastructure' },
-  { value: 'water_electricity', label: 'Water & Electricity' },
-  { value: 'domestic', label: 'Domestic Issue' },
-  { value: 'environment', label: 'Environment' },
-  { value: 'others', label: 'Others' },
-];
 
 export function ComplaintForm({
   onSubmit,
@@ -49,7 +36,6 @@ export function ComplaintForm({
     defaultValues: {
       title: '',
       description: '',
-      category: undefined,
       location: undefined,
       images: [],
       ...initialData,
@@ -66,7 +52,6 @@ export function ComplaintForm({
     return () => sub.unsubscribe();
   }, [watch]);
 
-  const selectedCategory = watch('category');
   const currentLocation = watch('location');
   const currentImages = watch('images');
 
@@ -78,7 +63,6 @@ export function ComplaintForm({
       reset({
         title: '',
         description: '',
-        category: undefined,
         location: undefined,
         images: [],
       });
@@ -107,53 +91,6 @@ export function ComplaintForm({
           disabled={loading}
           maxLength={100}
         />
-
-        {/* Category Field */}
-        <View className="mb-4">
-          <Text
-            className="text-sm font-medium mb-2"
-            style={{ color: colors.textPrimary }}
-          >
-            Category
-          </Text>
-          <Controller
-            control={control}
-            name="category"
-            render={({ field: { onChange, value } }) => (
-              <View className="flex-row flex-wrap gap-2">
-                {COMPLAINT_CATEGORIES.map((category) => {
-                  const isSelected = value === category.value;
-                  return (
-                    <TouchableOpacity
-                      key={category.value}
-                      onPress={() => onChange(category.value)}
-                      disabled={loading}
-                      className="px-4 py-2 rounded-full border"
-                      style={{
-                        borderColor: isSelected ? colors.primary : colors.border,
-                        backgroundColor: isSelected ? colors.primaryLight : colors.white,
-                      }}
-                    >
-                      <Text
-                        className="text-sm font-medium"
-                        style={{
-                          color: isSelected ? colors.white : colors.textSecondary,
-                        }}
-                      >
-                        {category.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          />
-          {errors.category && (
-            <Text className="text-sm mt-1" style={{ color: colors.error }}>
-              {errors.category.message}
-            </Text>
-          )}
-        </View>
 
         {/* Description Field */}
         <View className="mb-4">
