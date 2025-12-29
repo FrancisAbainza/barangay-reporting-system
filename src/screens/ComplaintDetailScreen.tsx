@@ -5,7 +5,8 @@ import { Button, IconButton } from '../components/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ComplaintsStackParamList } from '../navigation/AuthenticatedTabs';
 import { colors } from '../constants/colors';
-import { useDummyDb } from '../contexts/DummyDbContext';
+import { useComplaintDb } from '../contexts/ComplaintDbContext';
+import { Comment } from '../types/shared';
 import { getMapPreview, fetchAddress } from '../utils/mapUtils';
 
 type Props = NativeStackScreenProps<ComplaintsStackParamList, 'ComplaintDetail'>;
@@ -75,16 +76,18 @@ const getCategoryLabel = (category: string) => {
 
 export default function ComplaintDetailScreen({ route, navigation }: Props) {
   const { complaintId } = route.params;
-  const { getComplaint } = useDummyDb();
+  const { getComplaint } = useComplaintDb();
   const complaint = getComplaint(complaintId);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [commentText, setCommentText] = useState('');
+  const [replyText, setReplyText] = useState('');
+  const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
   const [address, setAddress] = useState<string>('');
   const screenWidth = Dimensions.get('window').width;
 
   useEffect(() => {
     async function loadAddress() {
-      if (complaint) {
+      if (complaint && complaint.location) {
         const fetchedAddress = await fetchAddress(complaint.location.latitude, complaint.location.longitude);
         setAddress(fetchedAddress);
       }
@@ -112,6 +115,34 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
     }
   };
 
+  const handleSubmitReply = (commentId: string) => {
+    if (replyText.trim()) {
+      // TODO: Implement reply submission
+      console.log('Submitting reply to comment:', commentId, replyText);
+      setReplyText('');
+      setReplyingToCommentId(null);
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent':
+        return colors.error;
+      case 'high':
+        return colors.warning;
+      case 'medium':
+        return colors.info;
+      case 'low':
+        return colors.gray500;
+      default:
+        return colors.gray500;
+    }
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    return priority.charAt(0).toUpperCase() + priority.slice(1);
+  };
+
   return (
     <View className="flex-1 bg-white">
       {/* Custom Header with Back Button */}
@@ -133,16 +164,24 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
         {/* Title and Status */}
         <View className="px-4 pt-4 pb-4">
-          <View className="flex-row items-start justify-between">
-            <Text className="text-2xl font-bold flex-1 mr-3" style={{ color: colors.gray900 }}>
-              {complaint.title}
-            </Text>
+          <Text className="text-2xl font-bold mb-3" style={{ color: colors.gray900 }}>
+            {complaint.title}
+          </Text>
+          <View className="flex-row items-center gap-2">
             <View
               className="px-4 py-2 rounded-full"
               style={{ backgroundColor: `${statusColor}15` }}
             >
               <Text className="text-sm font-semibold" style={{ color: statusColor }}>
                 {getStatusLabel(complaint.status)}
+              </Text>
+            </View>
+            <View
+              className="px-4 py-2 rounded-full"
+              style={{ backgroundColor: `${getPriorityColor(complaint.priority)}15` }}
+            >
+              <Text className="text-sm font-semibold" style={{ color: getPriorityColor(complaint.priority) }}>
+                {getPriorityLabel(complaint.priority)} Priority
               </Text>
             </View>
           </View>
@@ -169,11 +208,11 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
                   />
                 </View>
               )}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(_item, index) => index.toString()}
             />
             {complaint.images.length > 1 && (
               <View className="absolute bottom-4 self-center flex-row gap-2">
-                {complaint.images.map((_, index) => (
+                {complaint.images.map((_item, index) => (
                   <View
                     key={index}
                     className="w-2 h-2 rounded-full"
@@ -279,6 +318,52 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
             </Text>
           </View>
 
+          {/* Scheduled Date */}
+          {complaint.scheduledAt && (
+            <View
+              className="p-4 rounded-lg"
+              style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
+            >
+              <View className="flex-row items-center">
+                <Ionicons name="calendar-outline" size={20} color={colors.warning} />
+                <Text className="ml-2 text-sm font-medium" style={{ color: colors.gray500 }}>
+                  Scheduled Date
+                </Text>
+              </View>
+              <Text className="text-base mt-1 ml-7" style={{ color: colors.gray900 }}>
+                {new Date(complaint.scheduledAt).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </Text>
+            </View>
+          )}
+
+          {/* Resolved Date */}
+          {complaint.resolvedAt && (
+            <View
+              className="p-4 rounded-lg"
+              style={{ backgroundColor: colors.gray50, borderWidth: 1, borderColor: colors.gray200 }}
+            >
+              <View className="flex-row items-center">
+                <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+                <Text className="ml-2 text-sm font-medium" style={{ color: colors.gray500 }}>
+                  Resolved Date
+                </Text>
+              </View>
+              <Text className="text-base mt-1 ml-7" style={{ color: colors.gray900 }}>
+                {new Date(complaint.resolvedAt).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </Text>
+            </View>
+          )}
+
           {/* Location */}
           <View
             className="p-4 rounded-lg"
@@ -296,27 +381,76 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
                   {address}
                 </Text>
               )}
-              <Image
-                source={{ uri: getMapPreview(complaint.location.latitude, complaint.location.longitude) }}
-                style={{ width: '100%', height: 150, borderRadius: 8, marginBottom: 12 }}
-                resizeMode="cover"
-              />
-              <IconButton
-                onPress={() => {
-                  navigation.navigate('MapView', {
-                    latitude: complaint.location.latitude,
-                    longitude: complaint.location.longitude,
-                    title: complaint.title,
-                    address: address,
-                  });
-                }}
-                icon="map"
-                title="View on Map"
-                variant="primary"
-              />
+              {complaint.location && (
+                <Image
+                  source={{ uri: getMapPreview(complaint.location.latitude, complaint.location.longitude) }}
+                  style={{ width: '100%', height: 150, borderRadius: 8, marginBottom: 12 }}
+                  resizeMode="cover"
+                />
+              )}
+              {complaint.location && (
+                <IconButton
+                  onPress={() => {
+                    navigation.navigate('MapView', {
+                      latitude: complaint.location!.latitude,
+                      longitude: complaint.location!.longitude,
+                      title: complaint.title,
+                      address: address,
+                    });
+                  }}
+                  icon="map"
+                  title="View on Map"
+                  variant="primary"
+                />
+              )}
             </View>
           </View>
         </View>
+
+        {/* Resolution Details */}
+        {complaint.resolutionDetails && (
+          <View className="px-4 mt-6">
+            <View
+              className="p-4 rounded-lg"
+              style={{ backgroundColor: colors.success + '10', borderWidth: 1, borderColor: colors.success }}
+            >
+              <View className="flex-row items-center mb-3">
+                <Ionicons name="checkmark-circle" size={24} color={colors.success} />
+                <Text className="ml-2 text-lg font-semibold" style={{ color: colors.success }}>
+                  Resolution Details
+                </Text>
+              </View>
+              <Text className="text-base mb-3" style={{ color: colors.gray700 }}>
+                {complaint.resolutionDetails.description}
+              </Text>
+              {complaint.resolutionDetails.budget && (
+                <View className="flex-row items-center">
+                  <Ionicons name="cash-outline" size={18} color={colors.gray600} />
+                  <Text className="ml-2 text-sm" style={{ color: colors.gray600 }}>
+                    Budget: ₱{complaint.resolutionDetails.budget.toLocaleString()}
+                  </Text>
+                </View>
+              )}
+              {complaint.resolutionDetails.images && complaint.resolutionDetails.images.length > 0 && (
+                <View className="mt-3">
+                  <Text className="text-sm font-medium mb-2" style={{ color: colors.gray700 }}>
+                    Resolution Images:
+                  </Text>
+                  <View className="gap-2">
+                    {complaint.resolutionDetails.images.map((img, idx) => (
+                      <Image
+                        key={idx}
+                        source={{ uri: img.uri }}
+                        style={{ width: '100%', height: 200, borderRadius: 8 }}
+                        resizeMode="cover"
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
 
         {/* Comment Input */}
         <View className="px-4 mt-6">
@@ -352,7 +486,7 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
               Comments ({complaint.comments.length})
             </Text>
             <View className="gap-3">
-              {complaint.comments.map((comment) => (
+              {complaint.comments.map((comment: Comment) => (
                 <View
                   key={comment.id}
                   className="p-4 rounded-lg"
@@ -391,21 +525,130 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
                     {comment.content}
                   </Text>
 
-                  {/* Comment Voting */}
-                  <View className="flex-row items-center gap-4">
-                    <Pressable className="flex-row items-center active:opacity-70">
-                      <Ionicons name="thumbs-up-outline" size={18} color={colors.success} />
-                      <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
-                        {comment.likes?.length || 0}
-                      </Text>
-                    </Pressable>
-                    <Pressable className="flex-row items-center active:opacity-70">
-                      <Ionicons name="thumbs-down-outline" size={18} color={colors.error} />
-                      <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
-                        {comment.dislikes?.length || 0}
+                  {/* Comment Voting and Reply */}
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center gap-4">
+                      <Pressable className="flex-row items-center active:opacity-70">
+                        <Ionicons name="thumbs-up-outline" size={18} color={colors.success} />
+                        <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
+                          {comment.likes?.length || 0}
+                        </Text>
+                      </Pressable>
+                      <Pressable className="flex-row items-center active:opacity-70">
+                        <Ionicons name="thumbs-down-outline" size={18} color={colors.error} />
+                        <Text className="text-sm ml-1" style={{ color: colors.gray600 }}>
+                          {comment.dislikes?.length || 0}
+                        </Text>
+                      </Pressable>
+                    </View>
+                    <Pressable
+                      className="flex-row items-center active:opacity-70"
+                      onPress={() => setReplyingToCommentId(comment.id)}
+                    >
+                      <Ionicons name="return-down-forward" size={18} color={colors.primary} />
+                      <Text className="text-sm ml-1 font-medium" style={{ color: colors.primary }}>
+                        Reply
                       </Text>
                     </Pressable>
                   </View>
+
+                  {/* Replies */}
+                  {comment.replies && comment.replies.length > 0 && (
+                    <View className="mt-3 ml-4 pl-3 border-l-2" style={{ borderLeftColor: colors.gray300 }}>
+                      {comment.replies.map((reply) => (
+                        <View key={reply.id} className="mb-3">
+                          <View className="flex-row items-center mb-1">
+                            <View
+                              className="w-6 h-6 rounded-full items-center justify-center"
+                              style={{ backgroundColor: reply.isAdmin ? colors.primary : colors.gray400 }}
+                            >
+                              <Text className="text-xs font-semibold" style={{ color: colors.white }}>
+                                {reply.userName.charAt(0).toUpperCase()}
+                              </Text>
+                            </View>
+                            <Text className="text-sm font-semibold ml-2" style={{ color: colors.gray900 }}>
+                              {reply.userName}
+                              {reply.isAdmin && (
+                                <Text className="text-xs font-normal" style={{ color: colors.primary }}>
+                                  {' '}(Admin)
+                                </Text>
+                              )}
+                            </Text>
+                          </View>
+                          <Text className="text-sm ml-8 mb-2" style={{ color: colors.gray700 }}>
+                            {reply.content}
+                          </Text>
+                          <View className="flex-row items-center ml-8 gap-4">
+                            <Text className="text-xs" style={{ color: colors.gray400 }}>
+                              {new Date(reply.createdAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </Text>
+                            <View className="flex-row items-center gap-3">
+                              <View className="flex-row items-center">
+                                <Ionicons name="thumbs-up-outline" size={14} color={colors.success} />
+                                <Text className="text-xs ml-1" style={{ color: colors.gray500 }}>
+                                  {reply.likes?.length || 0}
+                                </Text>
+                              </View>
+                              <View className="flex-row items-center">
+                                <Ionicons name="thumbs-down-outline" size={14} color={colors.error} />
+                                <Text className="text-xs ml-1" style={{ color: colors.gray500 }}>
+                                  {reply.dislikes?.length || 0}
+                                </Text>
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+
+                  {/* Reply Input */}
+                  {replyingToCommentId === comment.id && (
+                    <View
+                      className="mt-3 p-3 rounded-lg"
+                      style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.gray300 }}
+                    >
+                      <TextInput
+                        placeholder="Write your reply..."
+                        placeholderTextColor={colors.gray400}
+                        value={replyText}
+                        onChangeText={setReplyText}
+                        multiline
+                        numberOfLines={3}
+                        textAlignVertical="top"
+                        className="text-sm mb-2"
+                        style={{ color: colors.gray900, minHeight: 60 }}
+                      />
+                      <View className="flex-row gap-2">
+                        <Pressable
+                          className="flex-1 py-2 rounded-lg items-center active:opacity-70"
+                          style={{ backgroundColor: colors.primary }}
+                          onPress={() => handleSubmitReply(comment.id)}
+                        >
+                          <Text className="text-sm font-semibold" style={{ color: colors.white }}>
+                            Submit Reply
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          className="flex-1 py-2 rounded-lg items-center active:opacity-70"
+                          style={{ backgroundColor: colors.gray200 }}
+                          onPress={() => {
+                            setReplyingToCommentId(null);
+                            setReplyText('');
+                          }}
+                        >
+                          <Text className="text-sm font-semibold" style={{ color: colors.gray700 }}>
+                            Cancel
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  )}
                 </View>
               ))}
             </View>

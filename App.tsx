@@ -6,6 +6,9 @@ import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import { DummyDbProvider } from './src/contexts/DummyDbContext';
+import { ComplaintDbProvider } from './src/contexts/ComplaintDbContext';
+import { ProjectDbProvider } from './src/contexts/ProjectDbContext';
+import { FormDraftProvider } from './src/contexts/FormDraftContext';
 import AuthenticationStack from './src/navigation/AuthenticationStack';
 import AuthenticatedTabs from './src/navigation/AuthenticatedTabs';
 
@@ -43,7 +46,13 @@ export default function App() {
   return (
     <AuthProvider>
       <DummyDbProvider>
-        <AppContent />
+        <ComplaintDbProvider>
+          <ProjectDbProvider>
+            <FormDraftProvider>
+              <AppContent />
+            </FormDraftProvider>
+          </ProjectDbProvider>
+        </ComplaintDbProvider>
       </DummyDbProvider>
     </AuthProvider>
   );

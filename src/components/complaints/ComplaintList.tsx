@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, View, Text } from 'react-native';
-import { Complaint } from '../../types/dummyDb';
+import { Complaint } from '../../types/complaint';
 import { ComplaintCard } from './ComplaintCard';
 import { colors } from '../../constants/colors';
 

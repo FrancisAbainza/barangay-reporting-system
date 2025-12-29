@@ -8,7 +8,7 @@ import { FormField, Button } from '../ui';
 import { LocationPicker } from '../ui/LocationPicker';
 import { ImagePickerComponent } from '../ui/ImagePicker';
 import { colors } from '../../constants/colors';
-import { ComplaintCategory } from '../../types/dummyDb';
+import { ComplaintCategory } from '../../types/complaint';
 import { useFormDraft } from '../../contexts/FormDraftContext';
 
 interface ComplaintFormProps {

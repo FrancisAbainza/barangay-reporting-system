@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Complaint } from '../../types/dummyDb';
+import { Complaint } from '../../types/complaint';
 import { colors } from '../../constants/colors';
 
 interface ComplaintCardProps {
