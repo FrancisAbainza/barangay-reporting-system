@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       // Mock user data
       const mockUser: User = {
-        id: '1',
+        id: 'user1',
         email,
         name: 'Demo User',
         role: 'resident',
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         : `${data.firstName} ${data.lastName}`;
       
       const mockUser: User = {
-        id: '2',
+        id: 'user1',
         email: data.email,
         name: fullName,
         role: 'resident',

@@ -4,15 +4,22 @@ import { ScreenContainer, ScreenHeader } from '../components/ui';
 import { ComplaintForm } from '../components/complaints';
 import { ComplaintFormData } from '../schemas/complaints';
 import { useComplaintDb } from '../contexts/ComplaintDbContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CreateScreen() {
   const [loading, setLoading] = useState(false);
   const { createComplaint } = useComplaintDb();
+  const { user } = useAuth();
 
   const handleSubmit = async (data: ComplaintFormData) => {
+    if (!user) {
+      Alert.alert('Error', 'You must be logged in to submit a complaint.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const newComplaint = createComplaint(data);
+      const newComplaint = createComplaint(data, user.id, user.name);
 
       Alert.alert(
         'Success',

@@ -20,9 +20,13 @@ export function ProjectList({ projects, onProjectPress }: ProjectListProps) {
     );
   }
 
+  const sortedProjects = [...projects].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
   return (
     <FlatList
-      data={projects}
+      data={sortedProjects}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <ProjectCard project={item} onPress={onProjectPress} />

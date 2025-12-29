@@ -45,6 +45,17 @@ export function LocationPicker({
   const [locationPermissionInformation, requestPermission] =
     useForegroundPermissions();
 
+  // Sync internal state when initialLocation prop changes (e.g., form reset)
+  useEffect(() => {
+    // Only update if the location actually changed (deep comparison)
+    const locationChanged = 
+      JSON.stringify(pickedLocation) !== JSON.stringify(initialLocation);
+    
+    if (locationChanged) {
+      setPickedLocation(initialLocation);
+    }
+  }, [initialLocation]);
+
   // Handle location from map picker
   useEffect(() => {
     async function handleMapPickedLocation() {

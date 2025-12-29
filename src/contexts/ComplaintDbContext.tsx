@@ -29,7 +29,7 @@ export type {
 // Context types
 interface ComplaintDbContextType {
   complaints: Complaint[];
-  createComplaint: (input: CreateComplaintInput) => Complaint;
+  createComplaint: (input: CreateComplaintInput, userId: string, userName: string) => Complaint;
   getComplaint: (id: string) => Complaint | undefined;
   deleteComplaint: (id: string) => boolean;
   updateComplaintStatus: (
@@ -610,7 +610,7 @@ export function ComplaintDbProvider({ children }: { children: ReactNode }) {
     return 'low';
   };
 
-  const createComplaint = (input: CreateComplaintInput): Complaint => {
+  const createComplaint = (input: CreateComplaintInput, userId: string, userName: string): Complaint => {
     // Determine category and priority using AI-based logic
     const category = determineCategory(input.title, input.description);
     const priority = determinePriority(input.title, input.description, category);
@@ -622,8 +622,8 @@ export function ComplaintDbProvider({ children }: { children: ReactNode }) {
       category,
       status: 'submitted',
       priority,
-      complainantName: 'Anonymous User', // Will be replaced with actual user data
-      complainantId: `user-${Math.floor(Math.random() * 1000)}`, // Will be replaced with actual user ID
+      complainantName: userName,
+      complainantId: userId,
       location: input.location!,
       images: input.images,
       createdAt: new Date(),

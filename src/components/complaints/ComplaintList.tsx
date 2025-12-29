@@ -20,9 +20,13 @@ export function ComplaintList({ complaints, onComplaintPress }: ComplaintListPro
     );
   }
 
+  const sortedComplaints = [...complaints].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
   return (
     <FlatList
-      data={complaints}
+      data={sortedComplaints}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <ComplaintCard complaint={item} onPress={onComplaintPress} />

@@ -2,6 +2,8 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import ComplaintsScreen from '../screens/ComplaintsScreen';
 import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
 import MapViewScreen from '../screens/MapViewScreen';
@@ -11,6 +13,7 @@ import TransparencyScreen from '../screens/TransparencyScreen';
 import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 import AccountScreen from '../screens/AccountScreen';
 import MapScreen from '../screens/MapScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
 import { colors } from '../constants/colors';
 import { View } from 'react-native';
 import { FormDraftProvider } from '../contexts/FormDraftContext';
@@ -54,6 +57,11 @@ export type MapStackParamList = {
   ProjectDetail: { projectId: string };
 };
 
+export type AccountStackParamList = {
+  AccountHome: undefined;
+  Notifications: undefined;
+};
+
 export type TabParamList = {
   Complaints: undefined;
   Transparency: undefined;
@@ -67,6 +75,7 @@ const ComplaintsStack = createNativeStackNavigator<ComplaintsStackParamList>();
 const TransparencyStack = createNativeStackNavigator<TransparencyStackParamList>();
 const CreateStack = createNativeStackNavigator<CreateStackParamList>();
 const MapStack = createNativeStackNavigator<MapStackParamList>();
+const AccountStack = createNativeStackNavigator<AccountStackParamList>();
 
 function ComplaintsNavigator() {
   return (
@@ -109,6 +118,39 @@ function MapNavigator() {
   );
 }
 
+function AccountNavigator() {
+  return (
+    <AccountStack.Navigator>
+      <AccountStack.Screen 
+        name="AccountHome" 
+        component={AccountScreen}
+        options={{ headerShown: false }}
+      />
+      <AccountStack.Screen 
+        name="Notifications" 
+        component={NotificationsScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'card'
+        }}
+      />
+    </AccountStack.Navigator>
+  );
+}
+
+function NotificationButton() {
+  const navigation = useNavigation<NavigationProp<TabParamList>>();
+  
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.navigate('Account', { screen: 'Notifications' } as any)}
+      className="mr-4"
+    >
+      <Ionicons name="notifications-outline" size={24} color={colors.gray900} />
+    </TouchableOpacity>
+  );
+}
+
 export default function AuthenticatedTabs() {
   return (
     <Tab.Navigator
@@ -121,6 +163,7 @@ export default function AuthenticatedTabs() {
         name="Complaints"
         component={ComplaintsNavigator}
         options={{
+          headerRight: () => <NotificationButton />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="megaphone" size={size} color={color} />
           ),
@@ -130,6 +173,7 @@ export default function AuthenticatedTabs() {
         name="Transparency"
         component={TransparencyNavigator}
         options={{
+          headerRight: () => <NotificationButton />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="file-tray-full" size={size} color={color} />
           ),
@@ -139,6 +183,7 @@ export default function AuthenticatedTabs() {
         name="Create"
         component={CreateNavigator}
         options={{
+          headerRight: () => <NotificationButton />,
           tabBarIcon: ({ focused }) => (
             <View
               className="items-center justify-center rounded-full mb-8"
@@ -161,6 +206,7 @@ export default function AuthenticatedTabs() {
         name="Map"
         component={MapNavigator}
         options={{
+          headerRight: () => <NotificationButton />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map" size={size} color={color} />
           ),
@@ -168,8 +214,9 @@ export default function AuthenticatedTabs() {
       />
       <Tab.Screen
         name="Account"
-        component={AccountScreen}
+        component={AccountNavigator}
         options={{
+          headerRight: () => <NotificationButton />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
