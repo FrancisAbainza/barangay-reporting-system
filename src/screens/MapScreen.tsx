@@ -59,6 +59,11 @@ export default function MapScreen() {
     return complaints.filter((complaint) => {
       if (!complaint.location) return false;
 
+      // Hide submitted complaints unless they belong to the current user
+      if (complaint.status === 'submitted' && (!user || complaint.complainantId !== user.id)) {
+        return false;
+      }
+
       if (complaintFilters.myComplaints && user && complaint.complainantId !== user.id) {
         return false;
       }

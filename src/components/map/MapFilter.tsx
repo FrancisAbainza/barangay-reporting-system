@@ -36,7 +36,6 @@ interface MapFilterProps {
 }
 
 const COMPLAINT_STATUS_OPTIONS: { value: ComplaintStatus; label: string }[] = [
-  { value: 'submitted', label: 'Submitted' },
   { value: 'under_review', label: 'Under Review' },
   { value: 'scheduled', label: 'Scheduled' },
   { value: 'in_progress', label: 'In Progress' },
