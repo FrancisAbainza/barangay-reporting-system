@@ -64,6 +64,11 @@ export default function MapScreen() {
         return false;
       }
 
+      // Hide dismissed complaints unless they belong to the current user
+      if (complaint.status === 'dismissed' && (!user || complaint.complainantId !== user.id)) {
+        return false;
+      }
+
       if (complaintFilters.myComplaints && user && complaint.complainantId !== user.id) {
         return false;
       }

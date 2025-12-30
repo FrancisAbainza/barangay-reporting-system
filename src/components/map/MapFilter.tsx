@@ -40,7 +40,6 @@ const COMPLAINT_STATUS_OPTIONS: { value: ComplaintStatus; label: string }[] = [
   { value: 'scheduled', label: 'Scheduled' },
   { value: 'in_progress', label: 'In Progress' },
   { value: 'resolved', label: 'Resolved' },
-  { value: 'dismissed', label: 'Dismissed' },
 ];
 
 const COMPLAINT_CATEGORY_OPTIONS: { value: ComplaintCategory; label: string }[] = [

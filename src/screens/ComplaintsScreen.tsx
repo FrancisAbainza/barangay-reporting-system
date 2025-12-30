@@ -24,7 +24,16 @@ export default function ComplaintsScreen({ navigation }: Props) {
   const filteredComplaints = useMemo(() => {
     return complaints.filter((complaint) => {
       // Hide submitted complaints unless they belong to the current user
-      if (complaint.status === 'submitted' && (!user || complaint.complainantId !== user.id)) {
+      if (
+        complaint.status === 'submitted' && (!user || complaint.complainantId !== user.id)
+      ) {
+        return false;
+      }
+
+      // Hide dismissed complaints unless they belong to the current user
+      if (
+        complaint.status === 'dismissed' && (!user || complaint.complainantId !== user.id)
+      ) {
         return false;
       }
 
