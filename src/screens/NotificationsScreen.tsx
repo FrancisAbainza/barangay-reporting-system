@@ -1,19 +1,20 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenContainer } from '../components/ui';
 import { colors } from '../constants/colors';
+import { AccountStackParamList } from '../navigation/AuthenticatedTabs';
 
 export default function NotificationsScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<AccountStackParamList>>();
 
   return (
     <ScreenContainer>
       <View className="px-6 py-4 border-b" style={{ borderBottomColor: colors.border }}>
         <View className="flex-row items-center">
           <TouchableOpacity 
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.navigate('AccountHome')}
             className="mr-3"
           >
             <Ionicons name="arrow-back" size={24} color={colors.gray900} />
