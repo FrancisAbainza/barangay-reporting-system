@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
 import { Alert } from 'react-native';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { ScreenContainer, ScreenHeader } from '../components/ui';
 import { ComplaintForm } from '../components/complaints';
 import { ComplaintFormData } from '../schemas/complaints';
 import { useComplaintDb } from '../contexts/ComplaintDbContext';
 import { useAuth } from '../contexts/AuthContext';
+import { CreateStackParamList, TabParamList } from '../navigation/AuthenticatedTabs';
+
+type CreateScreenNavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<CreateStackParamList, 'CreateForm'>,
+  BottomTabNavigationProp<TabParamList>
+>;
 
 export default function CreateScreen() {
   const [loading, setLoading] = useState(false);
   const { createComplaint } = useComplaintDb();
   const { user } = useAuth();
+  const navigation = useNavigation<CreateScreenNavigationProp>();
 
   const handleSubmit = async (data: ComplaintFormData) => {
     if (!user) {
@@ -28,7 +38,7 @@ export default function CreateScreen() {
           {
             text: 'OK',
             onPress: () => {
-              // Optionally navigate to complaints list or detail screen
+              navigation.navigate('Complaints', { screen: 'ComplaintsList' });
             },
           },
         ]
@@ -43,7 +53,7 @@ export default function CreateScreen() {
   return (
     <ScreenContainer>
       <ScreenHeader title="Report a Complaint" />
-      <ComplaintForm onSubmit={handleSubmit} loading={loading} />
+      <ComplaintForm onSubmit={handleSubmit} loading={loading} mode="create" />
     </ScreenContainer>
   );
 }

@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, Image, TextInput, Dimensions, FlatList } from 'react-native';
+import { View, Text, ScrollView, Pressable, Image, TextInput, Dimensions, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, IconButton } from '../components/ui';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ComplaintsStackParamList } from '../navigation/AuthenticatedTabs';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { ComplaintsStackParamList, TabParamList } from '../navigation/AuthenticatedTabs';
 import { colors } from '../constants/colors';
 import { useComplaintDb } from '../contexts/ComplaintDbContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Comment } from '../types/shared';
 import { getMapPreview, fetchAddress } from '../utils/mapUtils';
 
-type Props = NativeStackScreenProps<ComplaintsStackParamList, 'ComplaintDetail'>;
+type ComplaintDetailNavigationProp = CompositeNavigationProp<
+  NativeStackScreenProps<ComplaintsStackParamList, 'ComplaintDetail'>['navigation'],
+  BottomTabNavigationProp<TabParamList>
+>;
+
+type Props = {
+  route: NativeStackScreenProps<ComplaintsStackParamList, 'ComplaintDetail'>['route'];
+  navigation: ComplaintDetailNavigationProp;
+};
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -76,7 +87,8 @@ const getCategoryLabel = (category: string) => {
 
 export default function ComplaintDetailScreen({ route, navigation }: Props) {
   const { complaintId } = route.params;
-  const { getComplaint } = useComplaintDb();
+  const { getComplaint, deleteComplaint } = useComplaintDb();
+  const { user } = useAuth();
   const complaint = getComplaint(complaintId);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [commentText, setCommentText] = useState('');
@@ -84,6 +96,8 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
   const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
   const [address, setAddress] = useState<string>('');
   const screenWidth = Dimensions.get('window').width;
+
+  const isOwner = user && complaint && user.id === complaint.complainantId;
 
   useEffect(() => {
     async function loadAddress() {
@@ -143,6 +157,33 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
     return priority.charAt(0).toUpperCase() + priority.slice(1);
   };
 
+  const handleEdit = () => {
+    navigation.navigate('EditComplaint', { complaintId });
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Complaint',
+      'Are you sure you want to delete this complaint? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            const success = deleteComplaint(complaintId);
+            if (success) {
+              navigation.pop();
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View className="flex-1 bg-white">
       {/* Custom Header with Back Button */}
@@ -159,6 +200,22 @@ export default function ComplaintDetailScreen({ route, navigation }: Props) {
         <Text className="text-xl font-semibold flex-1" style={{ color: colors.gray900 }}>
           Complaint Details
         </Text>
+        {isOwner && (
+          <View className="flex-row gap-2">
+            <Pressable
+              onPress={handleEdit}
+              className="p-2 active:opacity-70"
+            >
+              <Ionicons name="create-outline" size={24} color={colors.primary} />
+            </Pressable>
+            <Pressable
+              onPress={handleDelete}
+              className="p-2 active:opacity-70"
+            >
+              <Ionicons name="trash-outline" size={24} color={colors.error} />
+            </Pressable>
+          </View>
+        )}
       </View>
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>

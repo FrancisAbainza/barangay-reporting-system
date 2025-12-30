@@ -5,12 +5,11 @@ import {
   useForegroundPermissions,
   PermissionStatus,
 } from 'expo-location';
-import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
+import { useNavigation, useRoute, useIsFocused, CompositeNavigationProp, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../constants/colors';
-import { CreateStackParamList } from '../../navigation/AuthenticatedTabs';
+import { CreateStackParamList, ComplaintsStackParamList, MapStackParamList } from '../../navigation/AuthenticatedTabs';
 import { getMapPreview, fetchAddress } from '../../utils/mapUtils';
 
 interface Location {
@@ -26,8 +25,18 @@ interface LocationPickerProps {
   disabled?: boolean;
 }
 
-type CreateFormNavigationProp = NativeStackNavigationProp<CreateStackParamList, 'CreateForm'>;
-type CreateFormRouteProp = RouteProp<CreateStackParamList, 'CreateForm'>;
+type LocationPickerNavigationProp = CompositeNavigationProp<
+  CompositeNavigationProp<
+    NativeStackNavigationProp<CreateStackParamList, 'CreateForm'>,
+    NativeStackNavigationProp<ComplaintsStackParamList, 'EditComplaint'>
+  >,
+  NativeStackNavigationProp<MapStackParamList, 'EditComplaint'>
+>;
+
+type LocationPickerRouteProp =
+  | RouteProp<CreateStackParamList, 'CreateForm'>
+  | RouteProp<ComplaintsStackParamList, 'EditComplaint'>
+  | RouteProp<MapStackParamList, 'EditComplaint'>;
 
 export function LocationPicker({
   onLocationChange,
@@ -38,8 +47,8 @@ export function LocationPicker({
   const [pickedLocation, setPickedLocation] = useState<Location | null>(
     initialLocation
   );
-  const navigation = useNavigation<CreateFormNavigationProp>();
-  const route = useRoute<CreateFormRouteProp>();
+  const navigation = useNavigation<LocationPickerNavigationProp>();
+  const route = useRoute<LocationPickerRouteProp>();
   const isFocused = useIsFocused();
 
   const [locationPermissionInformation, requestPermission] =

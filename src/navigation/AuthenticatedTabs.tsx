@@ -1,14 +1,16 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NavigatorScreenParams } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import ComplaintsScreen from '../screens/ComplaintsScreen';
 import ComplaintDetailScreen from '../screens/ComplaintDetailScreen';
+import EditComplaintScreen from '../screens/EditComplaintScreen';
 import MapViewScreen from '../screens/MapViewScreen';
-import CreateScreen from '../screens/CreateScreen';
 import MapPickerScreen from '../screens/MapPickerScreen';
+import CreateScreen from '../screens/CreateScreen';
 import TransparencyScreen from '../screens/TransparencyScreen';
 import ProjectDetailScreen from '../screens/ProjectDetailScreen';
 import AccountScreen from '../screens/AccountScreen';
@@ -21,6 +23,15 @@ import { FormDraftProvider } from '../contexts/FormDraftContext';
 export type ComplaintsStackParamList = {
   ComplaintsList: undefined;
   ComplaintDetail: { complaintId: string };
+  EditComplaint: {
+    complaintId: string;
+    pickedLatitude?: number;
+    pickedLongitude?: number;
+  };
+  MapPicker: {
+    initialLatitude?: number;
+    initialLongitude?: number;
+  };
   MapView: {
     latitude: number;
     longitude: number;
@@ -52,9 +63,24 @@ export type CreateStackParamList = {
 };
 
 export type MapStackParamList = {
-  MapView: undefined;
+  MapMain: undefined;
   ComplaintDetail: { complaintId: string };
   ProjectDetail: { projectId: string };
+  MapView: {
+    latitude: number;
+    longitude: number;
+    title?: string;
+    address?: string;
+  };
+  EditComplaint: {
+    complaintId: string;
+    pickedLatitude?: number;
+    pickedLongitude?: number;
+  };
+  MapPicker: {
+    initialLatitude?: number;
+    initialLongitude?: number;
+  };
 };
 
 export type AccountStackParamList = {
@@ -63,11 +89,11 @@ export type AccountStackParamList = {
 };
 
 export type TabParamList = {
-  Complaints: undefined;
-  Transparency: undefined;
-  Create: undefined;
-  Map: undefined;
-  Account: undefined;
+  Complaints: NavigatorScreenParams<ComplaintsStackParamList>;
+  Transparency: NavigatorScreenParams<TransparencyStackParamList>;
+  Create: NavigatorScreenParams<CreateStackParamList>;
+  Map: NavigatorScreenParams<MapStackParamList>;
+  Account: NavigatorScreenParams<AccountStackParamList>;
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -79,11 +105,15 @@ const AccountStack = createNativeStackNavigator<AccountStackParamList>();
 
 function ComplaintsNavigator() {
   return (
-    <ComplaintsStack.Navigator screenOptions={{ headerShown: false }}>
-      <ComplaintsStack.Screen name="ComplaintsList" component={ComplaintsScreen} />
-      <ComplaintsStack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
-      <ComplaintsStack.Screen name="MapView" component={MapViewScreen} />
-    </ComplaintsStack.Navigator>
+    <FormDraftProvider>
+      <ComplaintsStack.Navigator screenOptions={{ headerShown: false }}>
+        <ComplaintsStack.Screen name="ComplaintsList" component={ComplaintsScreen} />
+        <ComplaintsStack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
+        <ComplaintsStack.Screen name="EditComplaint" component={EditComplaintScreen} />
+        <ComplaintsStack.Screen name="MapPicker" component={MapPickerScreen} />
+        <ComplaintsStack.Screen name="MapView" component={MapViewScreen} />
+      </ComplaintsStack.Navigator>
+    </FormDraftProvider>
   );
 }
 
@@ -110,11 +140,16 @@ function CreateNavigator() {
 
 function MapNavigator() {
   return (
-    <MapStack.Navigator screenOptions={{ headerShown: false }}>
-      <MapStack.Screen name="MapView" component={MapScreen} />
-      <MapStack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
-      <MapStack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
-    </MapStack.Navigator>
+    <FormDraftProvider>
+      <MapStack.Navigator screenOptions={{ headerShown: false }}>
+        <MapStack.Screen name="MapMain" component={MapScreen} />
+        <MapStack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} />
+        <MapStack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
+        <MapStack.Screen name="MapView" component={MapViewScreen} />
+        <MapStack.Screen name="EditComplaint" component={EditComplaintScreen} />
+        <MapStack.Screen name="MapPicker" component={MapPickerScreen} />
+      </MapStack.Navigator>
+    </FormDraftProvider>
   );
 }
 

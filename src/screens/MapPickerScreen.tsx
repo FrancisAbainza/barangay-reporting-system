@@ -7,16 +7,25 @@ import {
   getCurrentPositionAsync,
   useForegroundPermissions,
   PermissionStatus,
-  reverseGeocodeAsync
 } from 'expo-location';
 import { colors } from '../constants/colors';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, CompositeNavigationProp, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { CreateStackParamList } from '../navigation/AuthenticatedTabs';
+import { CreateStackParamList, ComplaintsStackParamList, MapStackParamList } from '../navigation/AuthenticatedTabs';
 import { fetchAddress } from '../utils/mapUtils';
 
-type MapPickerRouteProp = RouteProp<CreateStackParamList, 'MapPicker'>;
-type MapPickerNavigationProp = NativeStackNavigationProp<CreateStackParamList, 'MapPicker'>;
+type MapPickerNavigationProp = CompositeNavigationProp<
+  CompositeNavigationProp<
+    NativeStackNavigationProp<CreateStackParamList, 'MapPicker'>,
+    NativeStackNavigationProp<ComplaintsStackParamList, 'MapPicker'>
+  >,
+  NativeStackNavigationProp<MapStackParamList, 'MapPicker'>
+>;
+
+type MapPickerRouteProp =
+  | RouteProp<CreateStackParamList, 'MapPicker'>
+  | RouteProp<ComplaintsStackParamList, 'MapPicker'>
+  | RouteProp<MapStackParamList, 'MapPicker'>;
 
 export default function MapPickerScreen() {
   const navigation = useNavigation<MapPickerNavigationProp>();
@@ -112,10 +121,22 @@ export default function MapPickerScreen() {
   }
 
   function handleConfirm() {
-    navigation.navigate('CreateForm', {
-      pickedLatitude: markerPosition.latitude,
-      pickedLongitude: markerPosition.longitude,
-    });
+    const state = navigation.getState();
+    const previousRoute = state.routes[state.index - 1];
+
+    if (previousRoute) {
+      navigation.dispatch({
+        ...CommonActions.setParams({
+          pickedLatitude: markerPosition.latitude,
+          pickedLongitude: markerPosition.longitude,
+        }),
+        // Ensure we target the correct navigator + route
+        target: state.key,
+        source: previousRoute.key,
+      });
+    }
+
+    navigation.goBack();
   }
 
   return (

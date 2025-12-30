@@ -32,6 +32,7 @@ interface ComplaintDbContextType {
   createComplaint: (input: CreateComplaintInput, userId: string, userName: string) => Complaint;
   getComplaint: (id: string) => Complaint | undefined;
   deleteComplaint: (id: string) => boolean;
+  updateComplaint: (id: string, input: UpdateComplaintInput) => Complaint | null;
   updateComplaintStatus: (
     id: string,
     status: ComplaintStatus,
@@ -635,9 +636,34 @@ export function ComplaintDbProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteComplaint = (id: string): boolean => {
-    const initialLength = complaints.length;
-    setComplaints((prev) => prev.filter((complaint) => complaint.id !== id));
-    return complaints.length !== initialLength;
+    let deleted = false;
+    setComplaints((prev) => {
+      const filtered = prev.filter((complaint) => complaint.id !== id);
+      deleted = filtered.length !== prev.length;
+      return filtered;
+    });
+    return deleted;
+  };
+
+  const updateComplaint = (id: string, input: UpdateComplaintInput): Complaint | null => {
+    let updatedComplaint: Complaint | null = null;
+
+    setComplaints((prev) =>
+      prev.map((complaint) => {
+        if (complaint.id === id) {
+          const updated = {
+            ...complaint,
+            ...input,
+            updatedAt: new Date(),
+          };
+          updatedComplaint = updated;
+          return updated;
+        }
+        return complaint;
+      })
+    );
+
+    return updatedComplaint;
   };
 
   const updateComplaintStatus = (
@@ -950,6 +976,7 @@ export function ComplaintDbProvider({ children }: { children: ReactNode }) {
     createComplaint,
     getComplaint,
     deleteComplaint,
+    updateComplaint,
     updateComplaintStatus,
     addComplaintComment,
     addReply,

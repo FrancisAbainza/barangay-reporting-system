@@ -39,18 +39,34 @@ export function ComplaintForm({
       location: undefined,
       images: [],
       ...initialData,
-      ...draft,
+      ...(draft ?? {}), // Persist changes across navigation (MapPicker)
     },
   });
 
+  useEffect(() => {
+    if (!initialData) return;
+
+    reset({
+      title: '',
+      description: '',
+      location: undefined,
+      images: [],
+      ...initialData,
+      ...(draft ?? {}),
+    });
+    // Intentionally does not depend on `draft` to avoid resetting on every keystroke.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData, reset]);
+
 
   useEffect(() => {
+    // Save changes to draft for persistence across navigation
     const sub = watch((value) => {
       setDraft(value as Partial<ComplaintFormData>);
     });
 
     return () => sub.unsubscribe();
-  }, [watch]);
+  }, [watch, setDraft]);
 
   const currentLocation = watch('location');
   const currentImages = watch('images');
@@ -59,16 +75,19 @@ export function ComplaintForm({
     try {
       await onSubmit(data);
 
-      // Clear RHF form
-      reset({
-        title: '',
-        description: '',
-        location: undefined,
-        images: [],
-      });
-
-      // Clear draft context
+      // Clear draft context after successful submission
+      // - create: clear form for a fresh submission
+      // - edit: keep values (screen will usually navigate away)
       clearDraft();
+
+      if (mode === 'create') {
+        reset({
+          title: '',
+          description: '',
+          location: undefined,
+          images: [],
+        });
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to submit complaint. Please try again.');
     }
@@ -171,7 +190,7 @@ export function ComplaintForm({
 
         {/* Submit Button */}
         <Button
-          title={mode === 'create' ? 'Submit Complaint' : 'Update Complaint'}
+          title={mode === 'edit' ? 'Update Complaint' : 'Submit Complaint'}
           onPress={handleSubmit(handleFormSubmit)}
           loading={loading}
           disabled={loading}
