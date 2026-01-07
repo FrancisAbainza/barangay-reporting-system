@@ -63,16 +63,15 @@ const initialComplaints: Complaint[] = [
   {
     id: "c1",
     title: "Broken Street Light on Main Road",
-    description:
-      "The street light near the corner of Main Road has been broken for two weeks. It's causing safety concerns for pedestrians at night.",
+    description: "The street light near the corner of Main Road has been broken for two weeks. It's causing safety concerns for pedestrians at night.",
     category: "infrastructure",
     status: "under_review",
     priority: "high",
     complainantName: "Juan Dela Cruz",
     complainantId: "user1",
     location: {
-      latitude: 14.325412,
-      longitude: 121.102834,
+      latitude: 14.308212,
+      longitude: 121.042834,
       address: "Corner Main Road, Barangay San Isidro",
     },
     images: [
@@ -113,16 +112,15 @@ const initialComplaints: Complaint[] = [
   {
     id: "c2",
     title: "Noise Complaint from Construction Site",
-    description:
-      "Construction work starting at 6 AM is causing excessive noise disturbance in the residential area.",
+    description: "Construction work starting at 6 AM is causing excessive noise disturbance in the residential area.",
     category: "noise",
     status: "scheduled",
     priority: "medium",
     complainantName: "Maria Santos",
     complainantId: "user2",
     location: {
-      latitude: 14.321876,
-      longitude: 121.108492,
+      latitude: 14.305876,
+      longitude: 121.048492,
       address: "Residential Area",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -135,16 +133,15 @@ const initialComplaints: Complaint[] = [
   {
     id: "c3",
     title: "Overflowing Garbage Bins",
-    description:
-      "The garbage bins at the corner of Rizal Street have been overflowing for three days. This is attracting pests and creating unsanitary conditions.",
+    description: "The garbage bins at the corner of Rizal Street have been overflowing for three days. This is attracting pests and creating unsanitary conditions.",
     category: "sanitation",
     status: "in_progress",
     priority: "urgent",
     complainantName: "Pedro Reyes",
     complainantId: "user3",
     location: {
-      latitude: 14.317943,
-      longitude: 121.099875,
+      latitude: 14.307943,
+      longitude: 121.049875,
       address: "Corner Rizal Street",
     },
     images: [
@@ -160,22 +157,20 @@ const initialComplaints: Complaint[] = [
   {
     id: "c4",
     title: "Water Leak on Bonifacio Avenue",
-    description:
-      "There's a significant water leak from the main pipe on Bonifacio Avenue. Water is flooding the street.",
+    description: "There's a significant water leak from the main pipe on Bonifacio Avenue. Water is flooding the street.",
     category: "water_electricity",
     status: "resolved",
     priority: "urgent",
     complainantName: "Rosa Martinez",
     complainantId: "user4",
     location: {
-      latitude: 14.328104,
-      longitude: 121.110221,
+      latitude: 14.308621,
+      longitude: 121.051930,
       address: "Bonifacio Avenue",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
     resolutionDetails: {
-      description:
-        "Replaced the damaged section of the main water pipe. Repairs completed successfully.",
+      description: "Replaced the damaged section of the main water pipe. Repairs completed successfully.",
       budget: 15000,
       images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
     },
@@ -189,16 +184,15 @@ const initialComplaints: Complaint[] = [
   {
     id: "c5",
     title: "Dangerous Pothole on Highway",
-    description:
-      "Large pothole on the highway entrance is causing accidents and vehicle damage.",
+    description: "Large pothole on the highway entrance is causing accidents and vehicle damage.",
     category: "public_safety",
     status: "submitted",
     priority: "high",
     complainantName: "Luis Fernandez",
     complainantId: "user5",
     location: {
-      latitude: 14.313904,
-      longitude: 121.105673,
+      latitude: 14.305904,
+      longitude: 121.045673,
       address: "Highway Entrance",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -218,8 +212,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Alvin Perez",
     complainantId: "user6",
     location: {
-      latitude: 14.318742,
-      longitude: 121.100934,
+      latitude: 14.307893,
+      longitude: 121.050707,
       address: "Phase 2 Residential Area",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -246,8 +240,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Jenny Cruz",
     complainantId: "user7",
     location: {
-      latitude: 14.327102,
-      longitude: 121.109832,
+      latitude: 14.309102,
+      longitude: 121.049832,
       address: "Block 3 Near Covered Court",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -275,8 +269,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Mark Villanueva",
     complainantId: "user8",
     location: {
-      latitude: 14.314982,
-      longitude: 121.104221,
+      latitude: 14.304982,
+      longitude: 121.044221,
       address: "Near Barangay Hall",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -304,8 +298,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Liza Moreno",
     complainantId: "user9",
     location: {
-      latitude: 14.320556,
-      longitude: 121.097842,
+      latitude: 14.307556,
+      longitude: 121.041842,
       address: "Purok 5",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -332,8 +326,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Noel Garcia",
     complainantId: "user10",
     location: {
-      latitude: 14.322993,
-      longitude: 121.111012,
+      latitude: 14.309993,
+      longitude: 121.051012,
       address: "Main Access Road",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -350,8 +344,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Paolo Reyes",
     complainantId: "user11",
     location: {
-      latitude: 14.316721,
-      longitude: 121.106998,
+      latitude: 14.306721,
+      longitude: 121.046998,
       address: "Road 2 Extension",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -368,8 +362,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Carmen Flores",
     complainantId: "user12",
     location: {
-      latitude: 14.328221,
-      longitude: 121.107553,
+      latitude: 14.308221,
+      longitude: 121.047553,
       address: "Near Daycare Center",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -387,8 +381,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Ramon Uy",
     complainantId: "user13",
     location: {
-      latitude: 14.312984,
-      longitude: 121.098774,
+      latitude: 14.309411,
+      longitude: 121.052895,
       address: "Back of Basketball Court",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -405,8 +399,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Anonymous",
     complainantId: "user14",
     location: {
-      latitude: 14.319331,
-      longitude: 121.103214,
+      latitude: 14.303963,
+      longitude: 121.041952,
       address: "Interior Street 4",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -423,13 +417,15 @@ const initialComplaints: Complaint[] = [
     complainantName: "Henry Lim",
     complainantId: "user15",
     location: {
-      latitude: 14.326784,
-      longitude: 121.101998,
+      latitude: 14.306784,
+      longitude: 121.041998,
       address: "Parkside Road",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
     resolutionDetails: {
       description: "Cleared fallen branch and cleaned area.",
+      budget: 1000,
+      images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
     },
     resolvedAt: new Date("2025-12-07T15:00:00"),
     createdAt: new Date("2025-12-07T10:00:00"),
@@ -445,8 +441,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Eric Santos",
     complainantId: "user16",
     location: {
-      latitude: 14.324211,
-      longitude: 121.110123,
+      latitude: 14.307211,
+      longitude: 121.050123,
       address: "Near Public Market",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -463,8 +459,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Grace Ong",
     complainantId: "user17",
     location: {
-      latitude: 14.315998,
-      longitude: 121.107221,
+      latitude: 14.305998,
+      longitude: 121.047221,
       address: "Phase 1 Housing",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -481,8 +477,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Dennis Yap",
     complainantId: "user18",
     location: {
-      latitude: 14.321109,
-      longitude: 121.099334,
+      latitude: 14.306109,
+      longitude: 121.049334,
       address: "Near Elementary School",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -499,8 +495,8 @@ const initialComplaints: Complaint[] = [
     complainantName: "Leo Bautista",
     complainantId: "user19",
     location: {
-      latitude: 14.328901,
-      longitude: 121.104876,
+      latitude: 14.309411,
+      longitude: 121.045514,
       address: "Jeepney Stop Zone",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
@@ -518,14 +514,14 @@ const initialComplaints: Complaint[] = [
     complainantName: "Melanie Cruz",
     complainantId: "user20",
     location: {
-      latitude: 14.313772,
-      longitude: 121.108445,
+      latitude: 14.303589,
+      longitude: 121.044720,
       address: "Vacant Lot beside Chapel",
     },
     images: [{ uri: `https://picsum.photos/seed/${Math.random()}/1280/720` }],
     createdAt: new Date("2025-12-28T08:55:00"),
     updatedAt: new Date("2025-12-28T08:55:00"),
-  },
+  }
 ];
 
 

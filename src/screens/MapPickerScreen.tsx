@@ -32,15 +32,15 @@ export default function MapPickerScreen() {
   const route = useRoute<MapPickerRouteProp>();
 
   const [region, setRegion] = useState<Region>({
-    latitude: route.params?.initialLatitude || 14.318828,
-    longitude: route.params?.initialLongitude || 121.102873,
+    latitude: route.params?.initialLatitude || 14.307030,
+    longitude: route.params?.initialLongitude || 121.046630,
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   });
 
   const [markerPosition, setMarkerPosition] = useState({
-    latitude: route.params?.initialLatitude || 14.318828,
-    longitude: route.params?.initialLongitude || 121.102873,
+    latitude: route.params?.initialLatitude || 14.307030,
+    longitude: route.params?.initialLongitude || 121.046630,
   });
 
   const [address, setAddress] = useState<string>('');

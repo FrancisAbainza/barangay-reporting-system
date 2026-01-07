@@ -26,8 +26,8 @@ type SelectedItem = {
 };
 
 const DEFAULT_REGION = {
-  latitude: 14.318828,
-  longitude: 121.102873,
+  latitude: 14.307030,
+  longitude: 121.046630,
   latitudeDelta: 0.05,
   longitudeDelta: 0.05,
 };
